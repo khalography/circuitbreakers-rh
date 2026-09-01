@@ -48,6 +48,7 @@
         <button class="btn btn-audio" id="audioToggle" aria-label="Toggle Audio Feedback">
           <span id="audioIcon">🔊</span> SOUNDS: ON
         </button>
+        <button class="btn-connect" id="navConnectBtn">CONNECT WALLET</button>
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
           <span id="hamburgerIcon">☰</span>
         </button>
@@ -70,11 +71,11 @@
       <div class="dapp-hero-stats">
         <div class="dapp-stat-box">
           <span class="d-stat-label">TOTAL BURNED $FUSE</span>
-          <span class="d-stat-val val-cyan" id="globalBurned">1,420 / 3,333</span>
+          <span class="d-stat-val val-cyan" id="globalBurned">0 / 3,333</span>
         </div>
         <div class="dapp-stat-box">
           <span class="d-stat-label">GRID ENERGIZED RATE</span>
-          <span class="d-stat-val val-amber">42.6% OF FLOAT</span>
+          <span class="d-stat-val val-amber" id="globalRate">0.0% OF FLOAT</span>
         </div>
       </div>
     </section>
@@ -83,18 +84,18 @@
     <div class="wallet-status-bar">
       <div class="ws-item">
         <span class="ws-label">CONNECTED WALLET</span>
-        <span class="ws-val" id="deskWallet">0x71C7...8976F</span>
+        <span class="ws-val" id="deskWallet">NOT CONNECTED</span>
       </div>
       <div class="ws-item">
         <span class="ws-label">AVAILABLE $FUSE</span>
-        <span class="ws-val val-cyan" id="fuseBalance">3.00 $FUSE</span>
+        <span class="ws-val val-cyan" id="fuseBalance">0.00 $FUSE</span>
       </div>
       <div class="ws-item">
         <span class="ws-label">TOTAL ACCRUED YIELD</span>
-        <span class="ws-val val-amber" id="totalAccruedYield">$42.80 USD</span>
+        <span class="ws-val val-amber" id="totalAccruedYield">$0.00 USD</span>
       </div>
       <div class="ws-action">
-        <button type="button" class="btn btn-accent" id="claimAllYieldBtn">Claim All Yield ($42.80)</button>
+        <button type="button" class="btn btn-accent" id="claimAllYieldBtn" disabled>Claim All Yield ($0.00)</button>
       </div>
     </div>
 
@@ -102,73 +103,17 @@
     <section class="terminal-panel" style="margin-bottom: 40px;">
       <div class="panel-header">
         <h2>MY CIRCUIT BREAKER INVENTORY</h2>
-        <span class="step-indicator" id="inventoryCount">2 DEVICES DETECTED</span>
+        <span class="step-indicator" id="inventoryCount">0 DEVICES DETECTED</span>
       </div>
 
-      <div class="breaker-desk-grid">
-
-        <!-- DEVICE 1: TRIPPED / UNLIT (READY TO ENERGIZE) -->
-        <div class="breaker-desk-card" id="breakerCard407">
-          <div class="bd-head">
-            <span class="bd-id">BREAKER #0407</span>
-            <span class="bd-badge badge-tripped" id="badge407">TRIPPED / UNLIT 🔴</span>
-          </div>
-          <div class="bd-art-wrap" id="artWrap407">
-            <img src="assets/type1.jpg" alt="Breaker 407" class="bd-img" id="img407">
-            <div class="switch-status" id="switch407">[ CIRCUIT OPEN // 0V ]</div>
-          </div>
-          <div class="bd-specs">
-            <div class="spec-row">
-              <span>Model Tier:</span>
-              <strong>Type-1 Single-Phase Bakelite</strong>
-            </div>
-            <div class="spec-row">
-              <span>Yield Multiplier:</span>
-              <strong class="val-cyan">1.0&times; Base Weight</strong>
-            </div>
-            <div class="spec-row">
-              <span>Current Status:</span>
-              <span id="yieldStatus407" class="text-dim">No Yield (Unlit)</span>
-            </div>
-          </div>
-          <div class="bd-action">
-            <button type="button" class="btn btn-primary btn-full energize-btn" id="energizeBtn407" data-id="407">
-              ⚡ BURN 1.0 $FUSE &amp; ENERGIZE
-            </button>
-          </div>
+      <div class="breaker-desk-grid" id="breakerDeskGrid">
+        <!-- Initial Disconnected State (Replaced dynamically by energize.js) -->
+        <div class="empty-inventory-state" id="emptyStateNotConnected">
+          <div class="empty-icon">🔌</div>
+          <h3 class="empty-title">WALLET NOT CONNECTED</h3>
+          <p class="empty-desc">Connect your Web3 EVM wallet to scan Robinhood Chain for your minted Circuit Breaker devices and manage your yield streams.</p>
+          <button type="button" class="btn btn-primary" id="promptConnectBtn">⚡ CONNECT WALLET</button>
         </div>
-
-        <!-- DEVICE 2: ALREADY ENERGIZED (ACTIVE YIELD STREAM) -->
-        <div class="breaker-desk-card energized" id="breakerCard1892">
-          <div class="bd-head">
-            <span class="bd-id">BREAKER #1892</span>
-            <span class="bd-badge badge-energized">ENERGIZED 🟢</span>
-          </div>
-          <div class="bd-art-wrap bd-art-energized">
-            <img src="assets/type2.jpg" alt="Breaker 1892" class="bd-img">
-            <div class="switch-status switch-active">[ CIRCUIT CLOSED // 125V ACTIVE ]</div>
-          </div>
-          <div class="bd-specs">
-            <div class="spec-row">
-              <span>Model Tier:</span>
-              <strong>Type-2 Dual-Circuit Relay</strong>
-            </div>
-            <div class="spec-row">
-              <span>Yield Multiplier:</span>
-              <strong class="val-cyan">1.5&times; Weight (Dual Affinity)</strong>
-            </div>
-            <div class="spec-row">
-              <span>Unclaimed Dividends:</span>
-              <strong class="val-amber" id="unclaimed1892">+$24.85 ($NVDA • $HOOD • T-Bills)</strong>
-            </div>
-          </div>
-          <div class="bd-action">
-            <button type="button" class="btn btn-accent btn-full claim-btn" id="claimBtn1892">
-              CLAIM $24.85 DIVIDENDS ✓
-            </button>
-          </div>
-        </div>
-
       </div>
     </section>
 

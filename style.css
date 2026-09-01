@@ -1421,6 +1421,83 @@ input[type="text"]:focus, input[type="url"]:focus {
   width: 100%;
 }
 
+/* EMPTY INVENTORY & WALLET CONNECT STATES */
+.empty-inventory-state {
+  grid-column: 1 / -1;
+  background: var(--bg-panel);
+  border: 2px dashed var(--bg-panel-light);
+  box-shadow: var(--shadow-pixel);
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.empty-icon {
+  font-size: 36px;
+  margin-bottom: 14px;
+}
+
+.empty-title {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  color: var(--paper-cream);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.empty-desc {
+  font-size: 14px;
+  color: var(--ink-soft);
+  max-width: 520px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.user-addr-mono {
+  font-family: var(--font-mono);
+  color: var(--cyan-electric);
+  word-break: break-all;
+}
+
+.btn-connect {
+  background: var(--paper-cream);
+  color: var(--ink-dark);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 8px 14px;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0px #000;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.btn-connect:hover {
+  background: var(--amber-caution);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.btn-connect.connected {
+  background: #090B0E;
+  color: var(--phosphor-green);
+  border-color: var(--phosphor-dim);
+}
+
+.btn-connect.connected::before {
+  content: "●";
+  color: var(--phosphor-green);
+  font-size: 10px;
+}
+
 /* FOOTER */
 .foot {
   border-top: 2px solid var(--bg-panel-light);

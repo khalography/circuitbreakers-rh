@@ -267,98 +267,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 1. Play High-Voltage Ignition Sound Effect
       playClickSound(1800, 'sawtooth', 0.2);
-      setTimeout(() => playClickSound(300, 'square', 0.1), 100);
+  // ---------------------------------------------------------------------------
+  // WEB3 NAVBAR WALLET CONNECT (MetaMask, Rabby, Coinbase Wallet)
+  // ---------------------------------------------------------------------------
+  const navConnectBtn = document.getElementById('navConnectBtn');
+  let currentNavAccount = null;
 
-      // 2. Trigger Flash Ignition Animation
-      const card407 = document.getElementById('breakerCard407');
-      card407.classList.add('igniting');
-      
-      // 3. Update Balance
-      userFuseBalance -= 1.0;
-      fuseBalanceEl.textContent = `${userFuseBalance.toFixed(2)} $FUSE`;
-
-      // 4. Update Card Visual State
-      setTimeout(() => {
-        card407.classList.remove('igniting');
-        card407.classList.add('energized');
-        
-        document.getElementById('badge407').className = 'bd-badge badge-energized';
-        document.getElementById('badge407').textContent = 'ENERGIZED 🟢';
-
-        document.getElementById('artWrap407').classList.add('bd-art-energized');
-        const sw = document.getElementById('switch407');
-        sw.className = 'switch-status switch-active';
-        sw.textContent = '[ CIRCUIT CLOSED // 125V ACTIVE ]';
-
-        document.getElementById('yieldStatus407').className = 'val-amber';
-        document.getElementById('yieldStatus407').innerHTML = '<strong>Streaming RWA Yield ($NVDA • $HOOD • T-Bills)</strong>';
-
-        energizeBtn407.className = 'btn btn-accent btn-full claim-btn';
-        energizeBtn407.textContent = 'CLAIM $0.00 DIVIDENDS ✓';
-        is407Energized = true;
-
-        alert('⚡ BREAKER #0407 ENERGIZED! 1.0 $FUSE burned. Device is now permanently streaming real-world stock yields.');
-      }, 500);
-    });
+  function formatNavAddress(addr) {
+    if (!addr) return 'CONNECT WALLET';
+    return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
   }
 
-  // Claim Breaker #1892 Dividends
-  if (claimBtn1892) {
-    claimBtn1892.addEventListener('click', () => {
-      if (yield1892 <= 0) {
-        alert('No pending dividends to claim right now. Yield streams continuously from DEX trades.');
-        return;
-      }
-      playClickSound(1300);
-      totalYieldAccrued -= yield1892;
-      alert(`⚡ Claimed +$${yield1892.toFixed(2)} in stock dividends to your wallet!`);
-      yield1892 = 0.0;
-      document.getElementById('unclaimed1892').textContent = '+$0.00 (Streaming)';
-      claimBtn1892.textContent = 'CLAIM $0.00 DIVIDENDS ✓';
-      totalAccruedYieldEl.textContent = `$${totalYieldAccrued.toFixed(2)} USD`;
-      claimAllYieldBtn.textContent = `Claim All Yield ($${totalYieldAccrued.toFixed(2)})`;
-    });
-  }
-
-  // Claim All Desk Yield
-  if (claimAllYieldBtn) {
-    claimAllYieldBtn.addEventListener('click', () => {
-      if (totalYieldAccrued <= 0) {
-        alert('No pending dividends to claim across substations.');
-        return;
-      }
-      playClickSound(1500);
-      alert(`⚡ All Yield Claimed! Successfully streamed +$${totalYieldAccrued.toFixed(2)} USD in tokenized stocks to ${document.getElementById('deskWallet').textContent}.`);
-      totalYieldAccrued = 0.0;
-      yield1892 = 0.0;
-      yield407 = 0.0;
-      totalAccruedYieldEl.textContent = `$0.00 USD`;
-      claimAllYieldBtn.textContent = `Claim All Yield ($0.00)`;
-      document.getElementById('unclaimed1892').textContent = '+$0.00 (Streaming)';
-      if (is407Energized) {
-        energizeBtn407.textContent = 'CLAIM $0.00 DIVIDENDS ✓';
-      }
-    });
-  }
-
-  // Continuous Real-Time Yield Ticker Simulation (Every 4 seconds)
-  setInterval(() => {
-    let delta = 0.02;
-    if (is407Energized) delta += 0.02;
-    totalYieldAccrued += delta;
-    totalAccruedYieldEl.textContent = `$${totalYieldAccrued.toFixed(2)} USD`;
-    claimAllYieldBtn.textContent = `Claim All Yield ($${totalYieldAccrued.toFixed(2)})`;
-
-    if (yield1892 > 0) {
-      yield1892 += 0.02;
-      document.getElementById('unclaimed1892').textContent = `+$${yield1892.toFixed(2)} ($NVDA • $HOOD • T-Bills)`;
-      claimBtn1892.textContent = `CLAIM $${yield1892.toFixed(2)} DIVIDENDS ✓`;
+  async function connectNavWallet() {
+    playClickSound(900);
+    if (typeof window.ethereum === 'undefined') {
+      alert('No Web3 EVM wallet detected. Please install MetaMask, Rabby, or Coinbase Wallet.');
+      return;
     }
 
-    if (is407Energized) {
-      yield407 += 0.02;
-      energizeBtn407.textContent = `CLAIM $${yield407.toFixed(2)} DIVIDENDS ✓`;
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      if (accounts && accounts.length > 0) {
+        currentNavAccount = accounts[0];
+        playClickSound(1200);
+
+        if (navConnectBtn) {
+          navConnectBtn.textContent = formatNavAddress(currentNavAccount);
+          navConnectBtn.classList.add('connected');
+        }
+
+        // Autofill wallet address on registration form if present
+        if (walletInput && !walletInput.value) {
+          walletInput.value = currentNavAccount;
+          state.walletAddress = currentNavAccount;
+          validateFormState();
+        }
+      }
+    } catch (err) {
+      console.error('Wallet connection rejected:', err);
     }
-  }, 4000);
+  }
+
+  if (navConnectBtn) {
+    navConnectBtn.addEventListener('click', () => {
+      if (currentNavAccount) {
+        if (confirm(`Connected as ${currentNavAccount}.\n\nDo you want to disconnect?`)) {
+          currentNavAccount = null;
+          navConnectBtn.textContent = 'CONNECT WALLET';
+          navConnectBtn.classList.remove('connected');
+          playClickSound(600);
+        }
+      } else {
+        connectNavWallet();
+      }
+    });
+  }
+
+  // Listen to provider events
+  if (typeof window.ethereum !== 'undefined') {
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (!accounts || accounts.length === 0) {
+        currentNavAccount = null;
+        if (navConnectBtn) {
+          navConnectBtn.textContent = 'CONNECT WALLET';
+          navConnectBtn.classList.remove('connected');
+        }
+      } else {
+        currentNavAccount = accounts[0];
+        if (navConnectBtn) {
+          navConnectBtn.textContent = formatNavAddress(currentNavAccount);
+          navConnectBtn.classList.add('connected');
+        }
+        if (walletInput && !walletInput.value) {
+          walletInput.value = currentNavAccount;
+          state.walletAddress = currentNavAccount;
+          validateFormState();
+        }
+      }
+    });
+  }
 
 });
