@@ -287,44 +287,141 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle Card Action (Burn to Energize or Claim)
-  function handleBreakerAction(tokenId) {
+  // ---------------------------------------------------------------------------
+  // LIVE DEPLOYED CONTRACT CONFIGURATION
+  // ---------------------------------------------------------------------------
+  const CONTRACTS = {
+    NFT: '0x363f0fa594bb0d9293ec1d1ba300854f2e185e8d',
+    FUSE: '0x4f4cDD87D266781A71386367F2c01343f97D23E8',
+    VAULT: '0xAaeb90114faBBB6dF25ca1840E8B3e57640e26cE',
+    CHAIN_ID: 4663
+  };
+
+  // Helper to get Archetype information by Token ID
+  function getBreakerTier(tokenId) {
+    // 3 Canonical Rarity Tiers (3,333 collection):
+    // Type-1: ~60% (Single-Phase), Type-2: ~25% (Dual Relay), Type-3: ~15% (HV Transformer)
+    const mod = tokenId % 20;
+    if (mod === 0 || mod === 7 || mod === 13) {
+      return {
+        tierName: 'Type-3 HV Transformer',
+        multiplier: '2.5x',
+        image: 'assets/type3.jpg'
+      };
+    } else if (mod === 2 || mod === 5 || mod === 9 || mod === 14 || mod === 18) {
+      return {
+        tierName: 'Type-2 Dual Relay',
+        multiplier: '1.5x',
+        image: 'assets/type2.jpg'
+      };
+    } else {
+      return {
+        tierName: 'Type-1 Single-Phase',
+        multiplier: '1.0x',
+        image: 'assets/type1.jpg'
+      };
+    }
+  }
+
+  // ABI Helpers for standard EVM RPC encoding/decoding
+  function pad32(val) {
+    let clean = String(val);
+    if (clean.startsWith('0x')) clean = clean.slice(2);
+    return clean.padStart(64, '0');
+  }
+
+  async function ethCall(to, data) {
+    if (!window.ethereum) return null;
+    try {
+      return await window.ethereum.request({
+        method: 'eth_call',
+        params: [{ to, data }, 'latest']
+      });
+    } catch (err) {
+      console.warn(`eth_call error to ${to}:`, err);
+      return null;
+    }
+  }
+
+  // Handle Card Action (Burn to Energize or Claim Yield)
+  async function handleBreakerAction(tokenId) {
     const breaker = userBreakers.find(b => b.tokenId === tokenId);
-    if (!breaker) return;
+    if (!breaker || !currentAccount || !window.ethereum) return;
 
     if (breaker.energized) {
-      if (breaker.unclaimedYield <= 0) {
-        alert(`⚡ Breaker #${String(tokenId).padStart(4, '0')} has no pending dividends to claim yet. Dividends stream continuously from DEX volume.`);
-        return;
+      // Claim Dividends from Vault Contract
+      try {
+        playSound(1300);
+        // claimYield(uint256 tokenId): selector 0x40bd2e23
+        const claimData = '0x40bd2e23' + pad32(tokenId.toString(16));
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: currentAccount,
+            to: CONTRACTS.VAULT,
+            data: claimData
+          }]
+        });
+        alert(`⚡ Claim submitted! TX Hash: ${txHash}\nDividends will be credited to your wallet.`);
+        await scanUserHoldings(currentAccount);
+      } catch (err) {
+        console.error('Claim failed:', err);
+        alert(err.message || 'Dividend claim transaction was cancelled or rejected.');
       }
-      playSound(1300);
-      const claimed = breaker.unclaimedYield;
-      totalYieldAccrued = Math.max(0, totalYieldAccrued - claimed);
-      breaker.unclaimedYield = 0.0;
-      updateStatsUI();
-      renderInventory();
-      alert(`⚡ Claimed +$${claimed.toFixed(2)} in stock dividends to your connected wallet!`);
     } else {
+      // Check $FUSE Balance
       if (userFuseBalance < 1.0) {
-        alert('Insufficient $FUSE token balance. You need at least 1.0 $FUSE to energize a breaker.');
+        alert('Insufficient $FUSE token balance. You need at least 1.0 $FUSE in your wallet to energize a breaker.');
         return;
       }
-      
-      playSound(1800, 'sawtooth', 0.2);
-      setTimeout(() => playSound(300, 'square', 0.1), 100);
 
-      const card = document.getElementById(`breakerCard${tokenId}`);
-      if (card) card.classList.add('igniting');
+      try {
+        playSound(1800, 'sawtooth', 0.2);
 
-      setTimeout(() => {
-        userFuseBalance = Math.max(0, userFuseBalance - 1.0);
-        globalBurnedCount += 1;
-        breaker.energized = true;
-        breaker.unclaimedYield = 0.0;
-        updateStatsUI();
-        renderInventory();
-        alert(`⚡ BREAKER #${String(tokenId).padStart(4, '0')} ENERGIZED! 1.0 $FUSE burned. Device is now live on the dividend grid.`);
-      }, 500);
+        // 1. Check Allowance for Vault on $FUSE Token
+        // allowance(owner, spender): selector 0xdd62ed3e
+        const allowData = '0xdd62ed3e' + pad32(currentAccount) + pad32(CONTRACTS.VAULT);
+        const allowRes = await ethCall(CONTRACTS.FUSE, allowData);
+        const currentAllowance = (allowRes && allowRes !== '0x') ? BigInt(allowRes) : 0n;
+
+        const requiredCost = 1000000000000000000n; // 1.0 ether (1e18)
+
+        if (currentAllowance < requiredCost) {
+          // Trigger approve(spender, amount): selector 0x095ea7b3
+          const approveAmount = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+          const approveData = '0x095ea7b3' + pad32(CONTRACTS.VAULT) + approveAmount;
+          
+          alert('⚡ Step 1/2: Please approve $FUSE spending for the Yield Vault in your wallet.');
+          const approveTx = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [{
+              from: currentAccount,
+              to: CONTRACTS.FUSE,
+              data: approveData
+            }]
+          });
+          console.log('Approval TX:', approveTx);
+        }
+
+        // 2. Call burnAndEnergize(tokenId): selector 0xdb7a0478
+        alert(`⚡ Step 2/2: Confirm burning 1.0 $FUSE to Energize Breaker #${String(tokenId).padStart(4, '0')}...`);
+        const energizeData = '0xdb7a0478' + pad32(tokenId.toString(16));
+        const energizeTx = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: currentAccount,
+            to: CONTRACTS.VAULT,
+            data: energizeData
+          }]
+        });
+
+        playSound(300, 'square', 0.1);
+        alert(`⚡ BREAKER #${String(tokenId).padStart(4, '0')} ENERGIZED!\nTX Hash: ${energizeTx}\nDevice is now live on the dividend grid.`);
+        await scanUserHoldings(currentAccount);
+      } catch (err) {
+        console.error('Energize transaction failed:', err);
+        alert(err.message || 'Energize transaction was cancelled or rejected.');
+      }
     }
   }
 
@@ -333,14 +430,94 @@ document.addEventListener('DOMContentLoaded', () => {
     playSound(750);
     if (inventoryCountEl) inventoryCountEl.textContent = 'SCANNING CHAIN...';
 
+    if (!window.ethereum || !account) {
+      userBreakers = [];
+      renderInventory();
+      updateStatsUI();
+      return;
+    }
+
     try {
-      if (window.ethereum) {
-        await window.ethereum.request({
-          method: 'eth_getBalance',
-          params: [account, 'latest']
-        });
-        userBreakers = [];
+      // 1. Query $FUSE Balance (ERC-20: balanceOf)
+      const fuseData = '0x70a08231' + pad32(account);
+      const fuseRes = await ethCall(CONTRACTS.FUSE, fuseData);
+      if (fuseRes && fuseRes !== '0x') {
+        const rawFuse = BigInt(fuseRes);
+        userFuseBalance = Number(rawFuse) / 1e18;
+      } else {
+        userFuseBalance = 0.0;
       }
+
+      // 2. Query Global Vault Energized Count (totalEnergizedCount)
+      const totalEnergizedRes = await ethCall(CONTRACTS.VAULT, '0x9232dc63');
+      if (totalEnergizedRes && totalEnergizedRes !== '0x') {
+        globalBurnedCount = Number(BigInt(totalEnergizedRes));
+      }
+
+      // 3. Query NFT Balance (ERC-721: balanceOf)
+      const nftBalData = '0x70a08231' + pad32(account);
+      const nftBalRes = await ethCall(CONTRACTS.NFT, nftBalData);
+      const nftCount = (nftBalRes && nftBalRes !== '0x') ? Number(BigInt(nftBalRes)) : 0;
+
+      const detectedBreakers = [];
+
+      if (nftCount > 0) {
+        // Query Transfer event logs where recipient is current account
+        try {
+          const paddedAccount = '0x' + pad32(account);
+          const logs = await window.ethereum.request({
+            method: 'eth_getLogs',
+            params: [{
+              address: CONTRACTS.NFT,
+              topics: [
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                null,
+                paddedAccount
+              ],
+              fromBlock: '0x0',
+              toBlock: 'latest'
+            }]
+          });
+
+          const candidateTokenIds = new Set();
+          if (logs && logs.length > 0) {
+            logs.forEach(log => {
+              if (log.topics && log.topics[3]) {
+                candidateTokenIds.add(Number(BigInt(log.topics[3])));
+              } else if (log.data && log.data !== '0x') {
+                candidateTokenIds.add(Number(BigInt(log.data)));
+              }
+            });
+          }
+
+          // Verify ownership & get energized status for each candidate token
+          for (const tokenId of candidateTokenIds) {
+            const ownerData = '0x6352211e' + pad32(tokenId.toString(16));
+            const ownerRes = await ethCall(CONTRACTS.NFT, ownerData);
+            if (ownerRes && ownerRes.toLowerCase().includes(account.slice(2).toLowerCase())) {
+              // Query isEnergized(tokenId) on Vault
+              const energizedData = '0x7c1f1891' + pad32(tokenId.toString(16));
+              const energizedRes = await ethCall(CONTRACTS.VAULT, energizedData);
+              const isEnergized = energizedRes ? (BigInt(energizedRes) > 0n) : false;
+
+              const tierInfo = getBreakerTier(tokenId);
+
+              detectedBreakers.push({
+                tokenId: tokenId,
+                energized: isEnergized,
+                tierName: tierInfo.tierName,
+                multiplier: tierInfo.multiplier,
+                image: tierInfo.image,
+                unclaimedYield: 0.0
+              });
+            }
+          }
+        } catch (logErr) {
+          console.warn('Transfer log scan warning:', logErr);
+        }
+      }
+
+      userBreakers = detectedBreakers;
     } catch (err) {
       console.warn('Holdings scan completed with default state:', err);
     }

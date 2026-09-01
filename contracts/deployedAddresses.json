@@ -1,0 +1,11 @@
+{
+  "network": "robinhood",
+  "chainId": 4663,
+  "deployer": "0xad8CF2Df7aeBCC94FA1c6E3bF605F351d7dF8186",
+  "timestamp": "2026-09-01T21:42:04.640Z",
+  "contracts": {
+    "FuseToken": "0x4f4cDD87D266781A71386367F2c01343f97D23E8",
+    "CircuitBreakersVault": "0xAaeb90114faBBB6dF25ca1840E8B3e57640e26cE",
+    "OpenSeaNFTCollection": "0x363f0fa594bb0d9293ec1d1ba300854f2e185e8d"
+  }
+}
