@@ -375,6 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         currentAccount = accounts[0];
+        localStorage.setItem('cb_connected_wallet', currentAccount);
+        localStorage.setItem('cb_wallet_type', walletType || 'injected');
         playSound(1200);
 
         if (navConnectBtn) {
@@ -389,9 +391,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Auto-Detect / Restore Wallet on Load
+  async function autoDetectWallet() {
+    const savedAccount = localStorage.getItem('cb_connected_wallet');
+    const savedWalletType = localStorage.getItem('cb_wallet_type') || 'injected';
+
+    let provider = window.ethereum;
+    if (savedWalletType === 'okx' && window.okxwallet) {
+      provider = window.okxwallet;
+    } else if (savedWalletType === 'phantom' && window.phantom && window.phantom.ethereum) {
+      provider = window.phantom.ethereum;
+    }
+
+    if (provider) {
+      try {
+        const accounts = await provider.request({ method: 'eth_accounts' });
+        if (accounts && accounts.length > 0) {
+          currentAccount = accounts[0];
+          localStorage.setItem('cb_connected_wallet', currentAccount);
+          if (navConnectBtn) {
+            navConnectBtn.textContent = formatAddress(currentAccount);
+            navConnectBtn.classList.add('connected');
+          }
+          await scanUserHoldings(currentAccount);
+          return;
+        }
+      } catch (err) {
+        console.warn('Auto silent account check:', err);
+      }
+    }
+
+    if (savedAccount) {
+      currentAccount = savedAccount;
+      if (navConnectBtn) {
+        navConnectBtn.textContent = formatAddress(currentAccount);
+        navConnectBtn.classList.add('connected');
+      }
+      await scanUserHoldings(currentAccount);
+    }
+  }
+
   // Disconnect Wallet / Switch
   function disconnectWallet() {
     currentAccount = null;
+    localStorage.removeItem('cb_connected_wallet');
+    localStorage.removeItem('cb_wallet_type');
     userFuseBalance = 0.0;
     totalYieldAccrued = 0.0;
     userBreakers = [];
@@ -435,6 +479,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Cross-Tab & Cross-Page State Sync
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'cb_connected_wallet') {
+      if (e.newValue) {
+        currentAccount = e.newValue;
+        if (navConnectBtn) {
+          navConnectBtn.textContent = formatAddress(currentAccount);
+          navConnectBtn.classList.add('connected');
+        }
+        scanUserHoldings(currentAccount);
+      } else {
+        disconnectWallet();
+      }
+    }
+  });
+
   // Ethereum Provider Event Listeners
   if (typeof window.ethereum !== 'undefined') {
     window.ethereum.on('accountsChanged', (accounts) => {
@@ -442,6 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         disconnectWallet();
       } else {
         currentAccount = accounts[0];
+        localStorage.setItem('cb_connected_wallet', currentAccount);
         if (navConnectBtn) {
           navConnectBtn.textContent = formatAddress(currentAccount);
           navConnectBtn.classList.add('connected');
@@ -458,5 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Render (Real Zero-State)
   updateStatsUI();
   renderInventory();
+  autoDetectWallet();
 
 });
