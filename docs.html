@@ -27,18 +27,27 @@
   <header class="topbar">
     <div class="wrap topbar-in">
       <a href="index.html" class="brand">CIRCUIT<span>BREAKERS</span></a>
-      <nav class="nav-links">
-        <a href="index.html#registrationPanel" class="nav-link">Register</a>
-        <a href="energize.html" class="nav-link">Energize &amp; Yield</a>
-        <a href="docs.html" class="nav-link active">Docs</a>
-      </nav>
-      <div class="header-badges">
-        <span class="badge badge-live"><i class="dot"></i> SPECS V1.0</span>
-        <span class="badge badge-chain">ROBINHOOD CHAIN</span>
+      
+      <div class="topbar-right">
+        <nav class="nav-links" id="navLinks">
+          <a href="index.html#registrationPanel" class="nav-link">Register</a>
+          <a href="energize.html" class="nav-link">Energize &amp; Yield</a>
+          <a href="docs.html" class="nav-link active">Docs</a>
+          <div class="mobile-only-drawer-item">
+            <span class="badge badge-chain">ROBINHOOD CHAIN</span>
+          </div>
+        </nav>
+        <div class="header-badges">
+          <span class="badge badge-live"><i class="dot"></i> SPECS V1.0</span>
+          <span class="badge badge-chain">ROBINHOOD CHAIN</span>
+        </div>
+        <button class="btn btn-audio" id="audioToggle" aria-label="Toggle Audio Feedback">
+          <span id="audioIcon">🔊</span> SOUNDS: ON
+        </button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
+          <span id="hamburgerIcon">☰</span>
+        </button>
       </div>
-      <button class="btn btn-audio" id="audioToggle" aria-label="Toggle Audio Feedback">
-        <span id="audioIcon">🔊</span> SOUNDS: ON
-      </button>
     </div>
   </header>
 

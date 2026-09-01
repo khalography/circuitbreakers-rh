@@ -50,6 +50,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Mobile Hamburger Menu Toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+
+  if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      if (hamburgerIcon) {
+        hamburgerIcon.textContent = isOpen ? '✕' : '☰';
+      }
+      playSound(isOpen ? 950 : 650);
+    });
+
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        if (hamburgerIcon) hamburgerIcon.textContent = '☰';
+      });
+    });
+  }
+
   // State
   let userFuseBalance = 3.0;
   let totalYieldAccrued = 42.80;

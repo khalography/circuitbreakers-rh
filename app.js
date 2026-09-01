@@ -53,6 +53,29 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => playClickSound(700));
   });
 
+  // Mobile Hamburger Menu Toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+
+  if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      if (hamburgerIcon) {
+        hamburgerIcon.textContent = isOpen ? '✕' : '☰';
+      }
+      playClickSound(isOpen ? 950 : 650);
+    });
+
+    // Close menu when a link is clicked
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        if (hamburgerIcon) hamburgerIcon.textContent = '☰';
+      });
+    });
+  }
+
   // State Management
   const state = {
     xUsername: '',
@@ -84,116 +107,124 @@ document.addEventListener('DOMContentLoaded', () => {
   const doneBtn = document.getElementById('doneBtn');
 
   // Task Verification Handlers
-  checkTask1.addEventListener('click', () => {
-    state.task1 = true;
-    checkTask1.classList.add('done');
-    checkTask1.innerHTML = 'Confirmed ✓';
-    document.getElementById('taskCard1').classList.add('completed');
-    validateFormState();
-    playClickSound(1100);
-  });
-
-  checkTask2.addEventListener('click', () => {
-    state.task2 = true;
-    checkTask2.classList.add('done');
-    checkTask2.innerHTML = 'Confirmed ✓';
-    document.getElementById('taskCard2').classList.add('completed');
-    validateFormState();
-    playClickSound(1100);
-  });
-
-  checkTask3.addEventListener('click', () => {
-    const url = replyUrlInput.value.trim();
-    if (!url || (!url.includes('x.com') && !url.includes('twitter.com'))) {
-      alert('Please enter a valid X reply link (e.g. https://x.com/your_handle/status/...)');
-      replyUrlInput.focus();
-      return;
-    }
-    state.replyUrl = url;
-    state.task3 = true;
-    checkTask3.classList.add('done');
-    checkTask3.innerHTML = 'Verified ✓';
-    document.getElementById('taskCard3').classList.add('completed');
-    validateFormState();
-    playClickSound(1100);
-  });
-
-  // Real-time Form & Progress Validation
-  xInput.addEventListener('input', validateFormState);
-  walletInput.addEventListener('input', validateFormState);
-
-  function validateFormState() {
-    const handle = xInput.value.trim();
-    const wallet = walletInput.value.trim();
-
-    let count = (state.task1 ? 1 : 0) + (state.task2 ? 1 : 0) + (state.task3 ? 1 : 0);
-    let pct = Math.round((count / 3) * 100);
-
-    progressFill.style.width = pct + '%';
-    progressPercent.textContent = `${count} / 3 TASKS COMPLETED`;
-
-    const isValidIdentity = handle.length > 0 && wallet.startsWith('0x') && wallet.length >= 15;
-
-    if (count === 3 && isValidIdentity) {
-      submitRegBtn.disabled = false;
-      submitRegBtn.classList.add('btn-primary');
-    } else {
-      submitRegBtn.disabled = true;
-    }
+  if (checkTask1) {
+    checkTask1.addEventListener('click', () => {
+      state.task1 = true;
+      checkTask1.classList.add('done');
+      checkTask1.innerHTML = 'Confirmed ✓';
+      const tc1 = document.getElementById('taskCard1');
+      if (tc1) tc1.classList.add('completed');
+      validateFormState();
+      playClickSound(1100);
+    });
   }
 
-  // Registration Submission
-  submitRegBtn.addEventListener('click', () => {
-    let handle = xInput.value.trim().replace(/^@/, '');
-    let wallet = walletInput.value.trim();
+  if (checkTask2) {
+    checkTask2.addEventListener('click', () => {
+      state.task2 = true;
+      checkTask2.classList.add('done');
+      checkTask2.innerHTML = 'Confirmed ✓';
+      const tc2 = document.getElementById('taskCard2');
+      if (tc2) tc2.classList.add('completed');
+      validateFormState();
+      playClickSound(1100);
+    });
+  }
 
-    if (!handle) {
-      alert('Please enter your X username.');
-      xInput.focus();
-      return;
-    }
-    if (!wallet || !wallet.startsWith('0x')) {
-      alert('Please enter a valid Robinhood Chain EVM wallet address.');
-      walletInput.focus();
-      return;
-    }
+  if (checkTask3) {
+    checkTask3.addEventListener('click', () => {
+      const url = replyUrlInput ? replyUrlInput.value.trim() : '';
+      if (!url || (!url.includes('x.com') && !url.includes('twitter.com'))) {
+        alert('Please enter a valid X reply link (e.g. https://x.com/your_handle/status/...)');
+        if (replyUrlInput) replyUrlInput.focus();
+        return;
+      }
+      state.replyUrl = url;
+      state.task3 = true;
+      checkTask3.classList.add('done');
+      checkTask3.innerHTML = 'Verified ✓';
+      const tc3 = document.getElementById('taskCard3');
+      if (tc3) tc3.classList.add('completed');
+      validateFormState();
+      playClickSound(1100);
+    });
+  }
 
-    state.xUsername = '@' + handle;
+  // Real-time Form & Progress Validation
+  if (xInput) xInput.addEventListener('input', validateFormState);
+  if (walletInput) walletInput.addEventListener('input', validateFormState);
+
+  function validateFormState() {
+    if (!xInput || !walletInput) return false;
+    const handle = xInput.value.trim();
+    const wallet = walletInput.value.trim();
+    state.xUsername = handle;
     state.walletAddress = wallet;
 
-    // Populate Success Receipt Modal
-    document.getElementById('recSerial').textContent = `#${state.serialNumber.toString().padStart(4, '0')}`;
-    document.getElementById('recHandle').textContent = state.xUsername;
-    document.getElementById('recWallet').textContent = state.walletAddress;
-    document.getElementById('recReply').textContent = state.replyUrl.length > 35 ? state.replyUrl.substring(0, 35) + '...' : state.replyUrl;
-    document.getElementById('recTime').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+    // Count completed social tasks
+    let completedTasks = 0;
+    if (state.task1) completedTasks++;
+    if (state.task2) completedTasks++;
+    if (state.task3) completedTasks++;
 
-    // Store in LocalStorage
-    const regRecord = {
-      handle: state.xUsername,
-      wallet: state.walletAddress,
-      replyUrl: state.replyUrl,
-      serial: state.serialNumber,
-      timestamp: new Date().toISOString()
-    };
-    localStorage.setItem('cb_registration', JSON.stringify(regRecord));
+    const percent = Math.round((completedTasks / 3) * 100);
+    if (progressFill) progressFill.style.width = `${percent}%`;
+    if (progressPercent) progressPercent.textContent = `${completedTasks} / 3 TASKS COMPLETED`;
 
-    // Show Modal
-    successModal.removeAttribute('hidden');
-    playClickSound(1400);
-  });
+    // Validate EVM Wallet format
+    const isValidWallet = /^0x[a-fA-F0-9]{40}$/.test(wallet);
+    const isValidHandle = handle.length >= 2;
+
+    const isFormReady = isValidHandle && isValidWallet && completedTasks === 3;
+    if (submitRegBtn) submitRegBtn.disabled = !isFormReady;
+
+    return isFormReady;
+  }
+
+  // Form Submit Action
+  if (submitRegBtn) {
+    submitRegBtn.addEventListener('click', () => {
+      if (!validateFormState()) return;
+
+      // Populate Receipt Modal
+      const recWallet = document.getElementById('recWallet');
+      const recHandle = document.getElementById('recHandle');
+      const recSerial = document.getElementById('recSerial');
+      const recTime = document.getElementById('recTime');
+
+      if (recWallet) recWallet.textContent = state.walletAddress;
+      if (recHandle) recHandle.textContent = `@${state.xUsername.replace(/^@/, '')}`;
+      if (recSerial) recSerial.textContent = `#CB-${state.serialNumber}`;
+      if (recTime) recTime.textContent = new Date().toUTCString();
+
+      // Save to localStorage
+      const regRecord = {
+        xHandle: state.xUsername,
+        wallet: state.walletAddress,
+        serial: state.serialNumber,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('cb_registration', JSON.stringify(regRecord));
+
+      // Show Modal
+      if (successModal) successModal.removeAttribute('hidden');
+      playClickSound(1400);
+    });
+  }
 
   // Modal Close & Reset
   function hideModal() {
-    successModal.setAttribute('hidden', 'true');
+    if (successModal) successModal.setAttribute('hidden', 'true');
     playClickSound(600);
   }
 
-  closeModalBtn.addEventListener('click', hideModal);
-  doneBtn.addEventListener('click', () => {
-    hideModal();
-    alert('🎉 Whitelist Ticket Saved! Thank you for energizing your registration for Circuit Breakers.');
-  });
+  if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
+  if (doneBtn) {
+    doneBtn.addEventListener('click', () => {
+      hideModal();
+      alert('🎉 Whitelist Ticket Saved! Thank you for energizing your registration for Circuit Breakers.');
+    });
+  }
 
   // ==========================================
   // ENERGIZE & YIELD DESK INTERACTIONS
