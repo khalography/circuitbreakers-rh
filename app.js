@@ -79,154 +79,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // State Management
-  const state = {
-    xUsername: '',
-    walletAddress: '',
-    replyUrl: '',
-    task1: false,
-    task2: false,
-    task3: false,
-    serialNumber: Math.floor(100 + Math.random() * 900)
-  };
+  // ---------------------------------------------------------------------------
+  // HERO DEVICE PREVIEW INTERACTION & VOLTAGE SIMULATION
+  // ---------------------------------------------------------------------------
+  const heroDeviceImg = document.getElementById('heroDeviceImg');
+  const voltageVal = document.getElementById('voltageVal');
+  const heroBadge = document.querySelector('.device-badge');
+  
+  const deviceShowcases = [
+    { name: 'TYPE-1 SINGLE BAKELITE', src: 'assets/type1.jpg', voltage: '110V / 20A' },
+    { name: 'TYPE-2 DUAL RELAY', src: 'assets/type2.jpg', voltage: '125V / 50A' },
+    { name: 'TYPE-3 TRANSFORMER', src: 'assets/type3.jpg', voltage: '220V / 100A' }
+  ];
+  let currentDeviceIndex = 1;
 
-  // Form Elements
-  const xInput = document.getElementById('xUsername');
-  const walletInput = document.getElementById('walletAddress');
-  const submitRegBtn = document.getElementById('submitRegBtn');
-
-  // Task Buttons & Elements
-  const checkTask1 = document.getElementById('checkTask1');
-  const checkTask2 = document.getElementById('checkTask2');
-  const checkTask3 = document.getElementById('checkTask3');
-  const replyUrlInput = document.getElementById('replyUrl');
-
-  const progressFill = document.getElementById('progressFill');
-  const progressPercent = document.getElementById('progressPercent');
-
-  // Modal Elements
-  const successModal = document.getElementById('successModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const doneBtn = document.getElementById('doneBtn');
-
-  // Task Verification Handlers
-  if (checkTask1) {
-    checkTask1.addEventListener('click', () => {
-      state.task1 = true;
-      checkTask1.classList.add('done');
-      checkTask1.innerHTML = 'Confirmed ✓';
-      const tc1 = document.getElementById('taskCard1');
-      if (tc1) tc1.classList.add('completed');
-      validateFormState();
+  if (heroDeviceImg) {
+    heroDeviceImg.style.cursor = 'pointer';
+    heroDeviceImg.addEventListener('click', () => {
+      currentDeviceIndex = (currentDeviceIndex + 1) % deviceShowcases.length;
+      const d = deviceShowcases[currentDeviceIndex];
+      heroDeviceImg.src = d.src;
+      if (heroBadge) heroBadge.textContent = d.name;
+      if (voltageVal) voltageVal.textContent = d.voltage;
       playClickSound(1100);
     });
   }
 
-  if (checkTask2) {
-    checkTask2.addEventListener('click', () => {
-      state.task2 = true;
-      checkTask2.classList.add('done');
-      checkTask2.innerHTML = 'Confirmed ✓';
-      const tc2 = document.getElementById('taskCard2');
-      if (tc2) tc2.classList.add('completed');
-      validateFormState();
-      playClickSound(1100);
-    });
-  }
-
-  if (checkTask3) {
-    checkTask3.addEventListener('click', () => {
-      const url = replyUrlInput ? replyUrlInput.value.trim() : '';
-      if (!url || (!url.includes('x.com') && !url.includes('twitter.com'))) {
-        alert('Please enter a valid X reply link (e.g. https://x.com/your_handle/status/...)');
-        if (replyUrlInput) replyUrlInput.focus();
-        return;
-      }
-      state.replyUrl = url;
-      state.task3 = true;
-      checkTask3.classList.add('done');
-      checkTask3.innerHTML = 'Verified ✓';
-      const tc3 = document.getElementById('taskCard3');
-      if (tc3) tc3.classList.add('completed');
-      validateFormState();
-      playClickSound(1100);
-    });
-  }
-
-  // Real-time Form & Progress Validation
-  if (xInput) xInput.addEventListener('input', validateFormState);
-  if (walletInput) walletInput.addEventListener('input', validateFormState);
-
-  function validateFormState() {
-    if (!xInput || !walletInput) return false;
-    const handle = xInput.value.trim();
-    const wallet = walletInput.value.trim();
-    state.xUsername = handle;
-    state.walletAddress = wallet;
-
-    // Count completed social tasks
-    let completedTasks = 0;
-    if (state.task1) completedTasks++;
-    if (state.task2) completedTasks++;
-    if (state.task3) completedTasks++;
-
-    const percent = Math.round((completedTasks / 3) * 100);
-    if (progressFill) progressFill.style.width = `${percent}%`;
-    if (progressPercent) progressPercent.textContent = `${completedTasks} / 3 TASKS COMPLETED`;
-
-    // Validate EVM Wallet format
-    const isValidWallet = /^0x[a-fA-F0-9]{40}$/.test(wallet);
-    const isValidHandle = handle.length >= 2;
-
-    const isFormReady = isValidHandle && isValidWallet && completedTasks === 3;
-    if (submitRegBtn) submitRegBtn.disabled = !isFormReady;
-
-    return isFormReady;
-  }
-
-  // Form Submit Action
-  if (submitRegBtn) {
-    submitRegBtn.addEventListener('click', () => {
-      if (!validateFormState()) return;
-
-      // Populate Receipt Modal
-      const recWallet = document.getElementById('recWallet');
-      const recHandle = document.getElementById('recHandle');
-      const recSerial = document.getElementById('recSerial');
-      const recTime = document.getElementById('recTime');
-
-      if (recWallet) recWallet.textContent = state.walletAddress;
-      if (recHandle) recHandle.textContent = `@${state.xUsername.replace(/^@/, '')}`;
-      if (recSerial) recSerial.textContent = `#CB-${state.serialNumber}`;
-      if (recTime) recTime.textContent = new Date().toUTCString();
-
-      // Save to localStorage
-      const regRecord = {
-        xHandle: state.xUsername,
-        wallet: state.walletAddress,
-        serial: state.serialNumber,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('cb_registration', JSON.stringify(regRecord));
-
-      // Show Modal
-      if (successModal) successModal.removeAttribute('hidden');
-      playClickSound(1400);
-    });
-  }
-
-  // Modal Close & Reset
-  function hideModal() {
-    if (successModal) successModal.setAttribute('hidden', 'true');
-    playClickSound(600);
-  }
-
-  if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
-  if (doneBtn) {
-    doneBtn.addEventListener('click', () => {
-      hideModal();
-      alert('🎉 Whitelist Ticket Saved! Thank you for energizing your registration for Circuit Breakers.');
-    });
+  // Micro-fluctuation of voltage meter
+  if (voltageVal) {
+    setInterval(() => {
+      const baseV = currentDeviceIndex === 2 ? 220 : (currentDeviceIndex === 1 ? 125 : 110);
+      const randOffset = (Math.random() * 4 - 2).toFixed(1);
+      const v = (baseV + parseFloat(randOffset)).toFixed(1);
+      voltageVal.textContent = `${v}V / ${currentDeviceIndex === 2 ? 100 : (currentDeviceIndex === 1 ? 50 : 20)}A`;
+    }, 3500);
   }
 
   // ---------------------------------------------------------------------------

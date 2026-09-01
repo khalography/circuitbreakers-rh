@@ -676,6 +676,308 @@ input[type="text"]:focus, input[type="url"]:focus {
   margin-top: 40px;
 }
 
+/* MINT HERO STATS RIBBON & CTA */
+.hero-mint-ribbon {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  margin-bottom: 22px;
+}
+
+.hm-stat-pill {
+  background: #090B0E;
+  border: 1px solid var(--bg-panel-light);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.hm-label {
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hm-val {
+  font-weight: 700;
+  color: var(--paper-cream);
+}
+
+.btn-glow {
+  box-shadow: 0 0 15px rgba(255, 196, 0, 0.4), var(--shadow-pixel);
+  animation: pulseGlow 2.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px rgba(255, 196, 0, 0.3), var(--shadow-pixel); }
+  100% { box-shadow: 0 0 25px rgba(255, 196, 0, 0.7), var(--shadow-pixel); }
+}
+
+.hero-cta-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* LIVE MINT SUBSTATION CONSOLE */
+.mint-console-panel {
+  background: var(--bg-panel);
+  border: 2px solid #000;
+  border-top: 4px solid var(--amber-caution);
+  box-shadow: var(--shadow-pixel);
+  padding: 32px;
+  margin-bottom: 45px;
+  position: relative;
+}
+
+.mint-console-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--bg-panel-light);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mint-console-head h2 {
+  font-family: var(--font-pixel);
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: var(--paper-cream);
+  letter-spacing: 1px;
+}
+
+.mint-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.mint-stat-card {
+  background: #090B0E;
+  border: 1px solid var(--bg-panel-light);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s;
+}
+
+.mint-stat-card:hover {
+  border-color: var(--cyan-electric);
+}
+
+.m-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+}
+
+.m-val {
+  font-family: var(--font-pixel);
+  font-size: 17px;
+  color: var(--paper-cream);
+}
+
+.m-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--cyan-electric);
+}
+
+.mint-action-box {
+  background: #0C0F14;
+  border: 2px dashed var(--amber-caution);
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* MINT HERO BUTTON (SLEEK & COMPACT) */
+.btn-hero-mint {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  padding: 10px 22px;
+  letter-spacing: 1px;
+  background: var(--amber-caution);
+  color: var(--ink-dark);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  box-shadow: 0 0 14px rgba(255, 196, 0, 0.4), var(--shadow-pixel);
+  transition: transform 0.15s, background-color 0.15s;
+}
+
+.btn-hero-mint:hover {
+  background: var(--paper-cream);
+  transform: translate(2px, 2px);
+}
+
+/* ARCHETYPES SHOWCASE SECTION (5 ON ONE LINE) */
+.archetypes-sec {
+  margin-top: 35px;
+  margin-bottom: 45px;
+}
+
+.archetypes-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 992px) {
+  .archetypes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+}
+
+.archetype-card {
+  background: var(--bg-panel);
+  border: 2px solid #000;
+  box-shadow: var(--shadow-pixel);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.archetype-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--cyan-electric);
+}
+
+.arch-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--amber-caution);
+  background: rgba(255, 196, 0, 0.08);
+  border: 1px solid var(--amber-caution);
+  padding: 2px 4px;
+  align-self: flex-start;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.arch-img-wrap {
+  border: 2px solid #000;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: #000;
+}
+
+.arch-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  image-rendering: pixelated;
+  transition: transform 0.3s;
+}
+
+.archetype-card:hover .arch-img {
+  transform: scale(1.04);
+}
+
+.arch-name {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--paper-cream);
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+.arch-desc {
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.arch-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--bg-panel-light);
+}
+
+.arch-spec-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-soft);
+  gap: 4px;
+}
+
+.arch-spec-row strong {
+  color: var(--cyan-electric);
+  text-align: right;
+}
+
+/* TOKENOMICS MATRIX */
+.tokenomics-sec {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.tokenomics-table-wrap {
+  background: var(--bg-panel);
+  border: 2px solid #000;
+  box-shadow: var(--shadow-pixel);
+  overflow-x: auto;
+  margin-top: 25px;
+}
+
+.tokenomics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: left;
+}
+
+.tokenomics-table th, .tokenomics-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--bg-panel-light);
+}
+
+.tokenomics-table th {
+  background: #090B0E;
+  color: var(--amber-caution);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.tokenomics-table td {
+  color: var(--paper-cream);
+}
+
+.tokenomics-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* SECTION HEADINGS */
 .sec-head {
   margin-bottom: 25px;
 }
