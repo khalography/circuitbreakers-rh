@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIRCUIT BREAKERS | Technical Documentation &amp; Protocol Specs</title>
+  <meta name="description" content="Complete protocol specifications, state machine architecture, fee distribution engine, and RWA yield mechanics for Circuit Breakers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="crt-overlay">
+
+  <!-- TOP STATUS MARQUEE -->
+  <div class="ticker-bar">
+    <div class="ticker-content">
+      <span>⚡ PROTOCOL DOCUMENTATION // ROBINHOOD CHAIN L2</span>
+      <span>• CONTRACT STANDARD: ERC-721 + ERC-20 FEE HOOK</span>
+      <span>• SUPPLY INVARIANT: 3,333 HARD CAP</span>
+      <span>• PERMANENT PROTOCOL TAX: 3.00%</span>
+      <span>• 0% TEAM ALLOCATION • 100% COMMUNITY FAIR LAUNCH</span>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a href="index.html" class="brand">CIRCUIT<span>BREAKERS</span></a>
+      <nav class="nav-links">
+        <a href="index.html#registrationPanel" class="nav-link">Register</a>
+        <a href="energize.html" class="nav-link">Energize &amp; Yield</a>
+        <a href="docs.html" class="nav-link active">Docs</a>
+      </nav>
+      <div class="header-badges">
+        <span class="badge badge-live"><i class="dot"></i> SPECS V1.0</span>
+        <span class="badge badge-chain">ROBINHOOD CHAIN</span>
+      </div>
+      <button class="btn btn-audio" id="audioToggle" aria-label="Toggle Audio Feedback">
+        <span id="audioIcon">🔊</span> SOUNDS: ON
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DOCUMENTATION CONTAINER -->
+  <main class="wrap main-content">
+
+    <!-- DOCS HERO HEADER -->
+    <section class="dapp-hero" style="margin-bottom: 30px;">
+      <div class="dapp-hero-left">
+        <span class="eyebrow" style="color: var(--cyan-electric); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; font-weight: 700;">CIRCUIT BREAKERS PROTOCOL // WHITE PAPER</span>
+        <h1 class="hero-title" style="margin-top: 6px;">TECHNICAL PROTOCOL SPECS</h1>
+        <p class="hero-lede" style="max-width: 720px;">
+          The complete architectural blueprint, mathematical fee models, device rarity weight matrices, and real-world asset distribution mechanics on Robinhood Chain.
+        </p>
+      </div>
+      <div class="dapp-hero-stats">
+        <div class="dapp-stat-box">
+          <span class="d-stat-label">PROTOCOL TAX</span>
+          <span class="d-stat-val val-cyan">3.00% DEX HOOK</span>
+        </div>
+        <div class="dapp-stat-box">
+          <span class="d-stat-label">YIELD SHARE</span>
+          <span class="d-stat-val val-amber">66.6% TO BREAKERS</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TWO-COLUMN DOCS LAYOUT -->
+    <div class="docs-layout">
+
+      <!-- LEFT STICKY SIDEBAR TABLE OF CONTENTS -->
+      <aside class="docs-sidebar">
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">DOCUMENTATION INDEX</h3>
+          <nav class="sidebar-nav">
+            <a href="#doc-overview" class="side-link">1. In One Paragraph</a>
+            <a href="#doc-vocab" class="side-link">2. The Vocabulary</a>
+            <a href="#doc-how" class="side-link">3. How It Works</a>
+            <a href="#doc-tiers" class="side-link">4. Device Models &amp; Weights</a>
+            <a href="#doc-fees" class="side-link">5. The 3% Fee Engine</a>
+            <a href="#doc-substations" class="side-link">6. RWA Substations</a>
+            <a href="#doc-halts" class="side-link">7. Market Halt Events</a>
+            <a href="#doc-faq" class="side-link">8. FAQ &amp; Verification</a>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- RIGHT MAIN CONTENT ARTICLES -->
+      <div class="docs-content-pane">
+
+        <!-- 1. In One Paragraph -->
+        <article class="doc-panel" id="doc-overview">
+          <div class="doc-panel-head">
+            <h3>1. In One Paragraph</h3>
+            <span class="panel-num">#01</span>
+          </div>
+          <p>
+            <strong>$FUSE has a strict hard cap of 3,333 units and never any more.</strong> Holding one whole liquid token automatically draws a volatile, unlit <em>Tripped Breaker</em> to your wallet from the unclaimed pool. Burn the token behind a device you own and the breaker is <strong>Energized</strong> — the copper knife switch snaps shut <code>[ON]</code>, its vacuum filaments ignite, and it permanently leaves the tradable float to earn continuous tokenized stock dividends from every DEX swap on Robinhood Chain. Every trade pays a permanent <strong>3.0% protocol fee</strong>: two thirds stream directly to Energized Breakers as RWA equity dividends, 20% compounds locked liquidity forever, and 14% buys back and burns $FUSE.
+          </p>
+        </article>
+
+        <!-- 2. The Vocabulary -->
+        <article class="doc-panel" id="doc-vocab">
+          <div class="doc-panel-head">
+            <h3>2. The Vocabulary</h3>
+            <span class="panel-num">#02</span>
+          </div>
+          <dl class="doc-glossary">
+            <div class="glossary-item">
+              <dt>Device / Circuit Breaker</dt>
+              <dd>One of the 3,333 mechanical electrical circuit breakers rendered in authentic 16-bit industrial pixel art.</dd>
+            </div>
+            <div class="glossary-item">
+              <dt>Tripped (Volatile State)</dt>
+              <dd>Backed by 1.0 liquid $FUSE. Knife switch is open, meters are dark, trades freely on DEXs, earns no yield. Dissolves back to pool if token balance drops below 1.0.</dd>
+            </div>
+            <div class="glossary-item">
+              <dt>Energized (Permanent State)</dt>
+              <dd>The backing 1.0 $FUSE token has been permanently burned. The knife switch snaps shut, vacuum filaments glow, and it begins streaming stock dividends continuously.</dd>
+            </div>
+            <div class="glossary-item">
+              <dt>Substation</dt>
+              <dd>The yield destination (Equities or US Treasury) streaming real-world asset dividends to Energized Breakers.</dd>
+            </div>
+            <div class="glossary-item">
+              <dt>Market Halt Event</dt>
+              <dd>An automated 15-minute protocol state triggered during volatility spikes that doubles (2&times;) fee distributions.</dd>
+            </div>
+          </dl>
+        </article>
+
+        <!-- 3. How It Works -->
+        <article class="doc-panel" id="doc-how">
+          <div class="doc-panel-head">
+            <h3>3. How It Works (The 5 Steps)</h3>
+            <span class="panel-num">#03</span>
+          </div>
+          <div class="doc-steps-grid">
+            <div class="step-box">
+              <span class="step-num">01</span>
+              <h4>Hold 1.0 $FUSE</h4>
+              <p>Cross the whole-unit token threshold and a random unlit Tripped Breaker materializes in your wallet.</p>
+            </div>
+            <div class="step-box">
+              <span class="step-num">02</span>
+              <h4>Reroll If Desired</h4>
+              <p>Selling below 1.0 dissolves your device back to the pool. Buying back draws a new random unit.</p>
+            </div>
+            <div class="step-box">
+              <span class="step-num">03</span>
+              <h4>Burn to Energize</h4>
+              <p>Call <code>burnAndEnergize()</code> to burn the backing token. The device becomes permanent and immutable.</p>
+            </div>
+            <div class="step-box">
+              <span class="step-num">04</span>
+              <h4>Dividends Stream</h4>
+              <p>Every trade on the DEX pays the 3.0% fee, streaming real-world stock fractions directly to your device.</p>
+            </div>
+            <div class="step-box">
+              <span class="step-num">05</span>
+              <h4>Float Deflation</h4>
+              <p>Every Energization permanently reduces the liquid $FUSE float while boosting yield for locked earners.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 4. Device Models & Weights -->
+        <article class="doc-panel" id="doc-tiers">
+          <div class="doc-panel-head">
+            <h3>4. Device Models &amp; Rarity Weights</h3>
+            <span class="panel-num">#04</span>
+          </div>
+          <p class="panel-desc">Every device belongs to an authentic historical engineering tier with unique mechanical perks and yield multipliers:</p>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Model / Era</th>
+                  <th>Supply</th>
+                  <th>Yield Multiplier</th>
+                  <th>Mechanical Perk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Type-1: Single-Phase Bakelite</strong></td>
+                  <td>2,000 (60.0%)</td>
+                  <td><span class="tag-weight">1.0&times;</span></td>
+                  <td>Standard Substation Yield Stream</td>
+                </tr>
+                <tr>
+                  <td><strong>Type-2: Dual-Circuit Relay</strong></td>
+                  <td>833 (25.0%)</td>
+                  <td><span class="tag-weight">1.5&times;</span></td>
+                  <td>Dual Desk Affinity (Splits across 2 Baskets)</td>
+                </tr>
+                <tr>
+                  <td><strong>Type-3: HV Transformer Breaker</strong></td>
+                  <td>333 (10.0%)</td>
+                  <td><span class="tag-weight">2.5&times;</span></td>
+                  <td>Surge Shield (+50% Market Halt Payout Bonus)</td>
+                </tr>
+                <tr>
+                  <td><strong>Type-4: Tri-Phase Master Console</strong></td>
+                  <td>160 (4.8%)</td>
+                  <td><span class="tag-weight">5.0&times;</span></td>
+                  <td>Grid Interconnect (Earns Across ALL Desks)</td>
+                </tr>
+                <tr>
+                  <td><strong>Type-5: Edison Patent Prototype</strong></td>
+                  <td>7 (0.2%)</td>
+                  <td><span class="tag-weight">10.0&times;</span></td>
+                  <td>Master Grid Skim (Direct Overall DEX Tax Cut)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- 5. The 3% Fee Engine -->
+        <article class="doc-panel" id="doc-fees">
+          <div class="doc-panel-head">
+            <h3>5. The 3.0% Fee Engine</h3>
+            <span class="panel-num">#05</span>
+          </div>
+          <p class="panel-desc">The permanent protocol fee is locked at <strong>3.0% of trading volume</strong>, enforced immutably by the Uniswap v4 / Robinhood Chain pool hook. Wallet-to-wallet transfers are tax-free:</p>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Stream Destination</th>
+                  <th>Share of Fee</th>
+                  <th>Share of Total Volume</th>
+                  <th>Mechanism</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Energized Breakers (RWA Yield)</strong></td>
+                  <td>66.6%</td>
+                  <td>2.00%</td>
+                  <td>Distributed continuously based on device tier weight</td>
+                </tr>
+                <tr>
+                  <td><strong>Permanently Locked Liquidity</strong></td>
+                  <td>20.0%</td>
+                  <td>0.60%</td>
+                  <td>Auto-compounds into immutable ownerless LP locker</td>
+                </tr>
+                <tr>
+                  <td><strong>$FUSE Buyback &amp; Burn</strong></td>
+                  <td>13.4%</td>
+                  <td>0.40%</td>
+                  <td>Automated market buyback and permanent burn</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- 6. RWA Substations -->
+        <article class="doc-panel" id="doc-substations">
+          <div class="doc-panel-head">
+            <h3>6. RWA Yield Substations</h3>
+            <span class="panel-num">#06</span>
+          </div>
+          <p class="panel-desc">Yield streams automatically allocate into two primary Real-World Asset Substations on Robinhood Chain:</p>
+          <div class="substation-grid-2col" style="margin-top: 10px;">
+            <div class="sub-card-featured sub-card-equities">
+              <div class="sub-card-top">
+                <div class="sub-icon-img"><img src="assets/robinhood_logo.png" alt="Robinhood Feather Logo" class="rh-logo-icon"></div>
+                <span class="sub-badge sub-badge-cyan">DEX VOLUME DIVIDENDS</span>
+              </div>
+              <h3>Tokenized Equities &amp; Stock Basket</h3>
+              <p class="sub-desc">High-growth tech heavyweights ($NVDA, $AAPL, $TSLA, $MSFT), Robinhood ecosystem assets ($HOOD, $ARBK, $WETH), and volatility squeeze equities ($GME, $PLTR).</p>
+            </div>
+            <div class="sub-card-featured sub-card-treasury">
+              <div class="sub-card-top">
+                <div class="sub-icon-emoji">🏦</div>
+                <span class="sub-badge sub-badge-amber">FIXED INCOME RESERVE</span>
+              </div>
+              <h3>US Treasury &amp; Fixed Income</h3>
+              <p class="sub-desc">Capital-preserving yield backed by tokenized short-term US Treasury Bills and USDG stable yield reserves.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 7. Market Halt Events -->
+        <article class="doc-panel" id="doc-halts">
+          <div class="doc-panel-head">
+            <h3>7. Market Halt Volatility Events</h3>
+            <span class="panel-num">#07</span>
+          </div>
+          <p>
+            When trading volume surges exponentially or real-world equity market volatility exceeds critical thresholds, the smart contract triggers a <strong>15-minute Market Halt State</strong>.
+          </p>
+          <p style="margin-top: 10px;">
+            During a Market Halt:
+          </p>
+          <ul style="margin-left: 20px; margin-top: 8px; color: var(--paper-cream); font-size: 14px; line-height: 1.6;">
+            <li><strong>2&times; Dividend Acceleration:</strong> Fee distribution rates to Energized Breakers double.</li>
+            <li><strong>Surge Shield Perks:</strong> Type-3, Type-4, and Type-5 devices activate their mechanical surge shields to capture surplus volume multipliers.</li>
+          </ul>
+        </article>
+
+        <!-- 8. FAQ & Verification -->
+        <article class="doc-panel" id="doc-faq">
+          <div class="doc-panel-head">
+            <h3>8. Frequently Asked Questions &amp; Verification</h3>
+            <span class="panel-num">#08</span>
+          </div>
+          <div class="faq-list">
+            <details class="faq-item" open>
+              <summary>Can an Energized Breaker ever be un-energized?</summary>
+              <p>No. Energizing is a strictly one-way function in the smart contract. There is no unwinding, unbonding, or escrow. The backing $FUSE is burned forever, and the device remains permanently active.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What network is Circuit Breakers deployed on?</summary>
+              <p>Circuit Breakers operates natively on Robinhood Chain (Arbitrum L2), enabling direct interaction with real-world tokenized equities, sub-cent gas fees, and instant finality.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What triggers a Market Halt event?</summary>
+              <p>Market Halt events trigger when DEX trading volume exceeds pre-set 1-hour volatility thresholds or real-world VIX volatility feeds trigger on-chain. During the 15-minute halt, dividend distribution rates to Energized Breakers double.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Is there any team allocation or insider tax cut?</summary>
+              <p>No. Circuit Breakers has a 0% team allocation and 0% venture reserve. 100% of tokens and devices circulate publicly via fair launch.</p>
+            </details>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span>CIRCUIT BREAKERS • FULLY ON-CHAIN ON ROBINHOOD CHAIN</span>
+      <div class="foot-links">
+        <a href="https://x.com" target="_blank">Twitter / X</a>
+        <a href="index.html#registrationPanel">Register</a>
+        <a href="energize.html">Energize &amp; Yield</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

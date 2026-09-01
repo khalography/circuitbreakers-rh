@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIRCUIT BREAKERS | High-Voltage Energize &amp; Yield Desk</title>
+  <meta name="description" content="Burn $FUSE to energize Circuit Breaker NFTs and stream real-world tokenized stock yields from Robinhood Chain DEX volume.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="crt-overlay">
+
+  <!-- TOP STATUS MARQUEE -->
+  <div class="ticker-bar">
+    <div class="ticker-content">
+      <span>⚡ SUBSTATION STATUS: ONLINE</span>
+      <span>• 2.0% DEX SWAP TAX STREAMING TO ENERGIZED BREAKERS</span>
+      <span>• $NVDA DIVIDEND: +4.8%</span>
+      <span>• $HOOD DIVIDEND: +12.3%</span>
+      <span>• $TSLA DIVIDEND: +3.1%</span>
+      <span>• US T-BILLS YIELD: +5.25% APY</span>
+      <span>• BURN RATE: 1.0 $FUSE PER ENERGIZATION</span>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a href="index.html" class="brand">CIRCUIT<span>BREAKERS</span></a>
+      <nav class="nav-links">
+        <a href="index.html#registrationPanel" class="nav-link">Register</a>
+        <a href="energize.html" class="nav-link active">Energize &amp; Yield</a>
+        <a href="docs.html" class="nav-link">Docs</a>
+      </nav>
+      <div class="header-badges">
+        <span class="badge badge-live"><i class="dot"></i> GRID LIVE</span>
+        <span class="badge badge-chain">ROBINHOOD CHAIN</span>
+      </div>
+      <button class="btn btn-audio" id="audioToggle" aria-label="Toggle Audio Feedback">
+        <span id="audioIcon">🔊</span> SOUNDS: ON
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DAPP CONTAINER -->
+  <main class="wrap main-content">
+
+    <!-- PAGE HERO HEADER -->
+    <section class="dapp-hero">
+      <div class="dapp-hero-left">
+        <span class="eyebrow" style="color: var(--phosphor-green); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; font-weight: 700;">SUBSTATION PROTOCOL // YIELD DESK</span>
+        <h1 class="hero-title" style="margin-top: 6px;">BURN &amp; ENERGIZE TERMINAL</h1>
+        <p class="hero-lede" style="max-width: 680px;">
+          Close the electrical circuit on your mechanical Breaker devices. Burning 1.0 $FUSE permanently locks your breaker into the high-voltage yield grid to stream real-world stock dividends on Robinhood Chain.
+        </p>
+      </div>
+      <div class="dapp-hero-stats">
+        <div class="dapp-stat-box">
+          <span class="d-stat-label">TOTAL BURNED $FUSE</span>
+          <span class="d-stat-val val-cyan" id="globalBurned">1,420 / 3,333</span>
+        </div>
+        <div class="dapp-stat-box">
+          <span class="d-stat-label">GRID ENERGIZED RATE</span>
+          <span class="d-stat-val val-amber">42.6% OF FLOAT</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- WALLET & $FUSE BALANCE OVERVIEW BAR -->
+    <div class="wallet-status-bar">
+      <div class="ws-item">
+        <span class="ws-label">CONNECTED WALLET</span>
+        <span class="ws-val" id="deskWallet">0x71C7...8976F</span>
+      </div>
+      <div class="ws-item">
+        <span class="ws-label">AVAILABLE $FUSE</span>
+        <span class="ws-val val-cyan" id="fuseBalance">3.00 $FUSE</span>
+      </div>
+      <div class="ws-item">
+        <span class="ws-label">TOTAL ACCRUED YIELD</span>
+        <span class="ws-val val-amber" id="totalAccruedYield">$42.80 USD</span>
+      </div>
+      <div class="ws-action">
+        <button type="button" class="btn btn-accent" id="claimAllYieldBtn">Claim All Yield ($42.80)</button>
+      </div>
+    </div>
+
+    <!-- MY BREAKERS INVENTORY SECTION -->
+    <section class="terminal-panel" style="margin-bottom: 40px;">
+      <div class="panel-header">
+        <h2>MY CIRCUIT BREAKER INVENTORY</h2>
+        <span class="step-indicator" id="inventoryCount">2 DEVICES DETECTED</span>
+      </div>
+
+      <div class="breaker-desk-grid">
+
+        <!-- DEVICE 1: TRIPPED / UNLIT (READY TO ENERGIZE) -->
+        <div class="breaker-desk-card" id="breakerCard407">
+          <div class="bd-head">
+            <span class="bd-id">BREAKER #0407</span>
+            <span class="bd-badge badge-tripped" id="badge407">TRIPPED / UNLIT 🔴</span>
+          </div>
+          <div class="bd-art-wrap" id="artWrap407">
+            <img src="assets/type1.jpg" alt="Breaker 407" class="bd-img" id="img407">
+            <div class="switch-status" id="switch407">[ CIRCUIT OPEN // 0V ]</div>
+          </div>
+          <div class="bd-specs">
+            <div class="spec-row">
+              <span>Model Tier:</span>
+              <strong>Type-1 Single-Phase Bakelite</strong>
+            </div>
+            <div class="spec-row">
+              <span>Yield Multiplier:</span>
+              <strong class="val-cyan">1.0&times; Base Weight</strong>
+            </div>
+            <div class="spec-row">
+              <span>Current Status:</span>
+              <span id="yieldStatus407" class="text-dim">No Yield (Unlit)</span>
+            </div>
+          </div>
+          <div class="bd-action">
+            <button type="button" class="btn btn-primary btn-full energize-btn" id="energizeBtn407" data-id="407">
+              ⚡ BURN 1.0 $FUSE &amp; ENERGIZE
+            </button>
+          </div>
+        </div>
+
+        <!-- DEVICE 2: ALREADY ENERGIZED (ACTIVE YIELD STREAM) -->
+        <div class="breaker-desk-card energized" id="breakerCard1892">
+          <div class="bd-head">
+            <span class="bd-id">BREAKER #1892</span>
+            <span class="bd-badge badge-energized">ENERGIZED 🟢</span>
+          </div>
+          <div class="bd-art-wrap bd-art-energized">
+            <img src="assets/type2.jpg" alt="Breaker 1892" class="bd-img">
+            <div class="switch-status switch-active">[ CIRCUIT CLOSED // 125V ACTIVE ]</div>
+          </div>
+          <div class="bd-specs">
+            <div class="spec-row">
+              <span>Model Tier:</span>
+              <strong>Type-2 Dual-Circuit Relay</strong>
+            </div>
+            <div class="spec-row">
+              <span>Yield Multiplier:</span>
+              <strong class="val-cyan">1.5&times; Weight (Dual Affinity)</strong>
+            </div>
+            <div class="spec-row">
+              <span>Unclaimed Dividends:</span>
+              <strong class="val-amber" id="unclaimed1892">+$24.85 ($NVDA • $HOOD • T-Bills)</strong>
+            </div>
+          </div>
+          <div class="bd-action">
+            <button type="button" class="btn btn-accent btn-full claim-btn" id="claimBtn1892">
+              CLAIM $24.85 DIVIDENDS ✓
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span>CIRCUIT BREAKERS • FULLY ON-CHAIN ON ROBINHOOD CHAIN</span>
+      <div class="foot-links">
+        <a href="https://x.com" target="_blank">Twitter / X</a>
+        <a href="index.html#registrationPanel">Register</a>
+        <a href="docs.html">Docs</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="energize.js"></script>
+</body>
+</html>
