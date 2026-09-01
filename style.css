@@ -813,6 +813,87 @@ input[type="text"]:focus, input[type="url"]:focus {
 .val-cyan { color: var(--cyan-electric); font-weight: 700; }
 .val-amber { color: var(--amber-caution); font-weight: 700; }
 
+/* TL;DR YIELD EXPLAINER */
+.tldr-yield-sec {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.tldr-yield-card {
+  background: var(--bg-panel);
+  border: 2px solid #000;
+  border-left: 5px solid var(--phosphor-green);
+  box-shadow: var(--shadow-pixel);
+  padding: 24px;
+}
+
+.tldr-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tldr-head h3 {
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  color: var(--paper-cream);
+  letter-spacing: 1px;
+}
+
+.tldr-answer {
+  font-size: 15px;
+  color: var(--paper-cream);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.tldr-answer strong {
+  color: var(--phosphor-green);
+}
+
+.tldr-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.tldr-step {
+  background: #090B0E;
+  border: 1px solid var(--bg-panel-light);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.t-step-num {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  color: var(--amber-caution);
+  margin-bottom: 8px;
+}
+
+.tldr-step h4 {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--paper-cream);
+  margin-bottom: 6px;
+}
+
+.tldr-step p {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.tldr-link {
+  color: var(--cyan-electric);
+  text-decoration: underline;
+}
+
 /* TOPBAR NAV LINKS */
 .nav-links {
   display: flex;
