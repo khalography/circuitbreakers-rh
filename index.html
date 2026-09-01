@@ -313,6 +313,105 @@
 
   </main>
 
+  <!-- WALLET SELECTION MODAL -->
+  <div class="wallet-modal-overlay" id="walletModalOverlay">
+    <div class="wallet-modal-card">
+      <div class="wallet-modal-header">
+        <div class="wm-title-group">
+          <h3>CONNECT WALLET</h3>
+          <p>Select your EVM wallet provider</p>
+        </div>
+        <button type="button" class="wm-close-btn" id="closeWalletModal" aria-label="Close Wallet Modal">&times;</button>
+      </div>
+      
+      <div class="wallet-options-list">
+        <!-- OKX Wallet -->
+        <button type="button" class="wallet-opt-btn" data-wallet="okx">
+          <div class="w-opt-left">
+            <span class="w-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#000"/><path d="M6 6h4v4H6V6zm8 0h4v4h-4V6zm-4 4h4v4h-4v-4zm-4 4h4v4H6v-4zm8 0h4v4h-4v-4z" fill="#FFF"/></svg>
+            </span>
+            <span class="w-name">OKX Wallet</span>
+          </div>
+          <span class="w-badge" id="badgeOkx">Installed</span>
+        </button>
+
+        <!-- MetaMask -->
+        <button type="button" class="wallet-opt-btn" data-wallet="metamask">
+          <div class="w-opt-left">
+            <span class="w-icon">
+              <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><path d="M28.4 4.5l-10.8 8 2 4.7 8.8-12.7z" fill="#E2761B"/><path d="M3.6 4.5l10.7 8.1-2 4.6L3.6 4.5z" fill="#E4761B"/><path d="M24.7 21.9l-2.4 3.7.6.9 3.4-.3 1.1-4.2-2.7-.1z" fill="#E4761B"/><path d="M4.6 22l1.1 4.2 3.4.3.6-.9-2.4-3.7-2.7.1z" fill="#E4761B"/><path d="M10.1 14.2l-1.9 2.8 3.5.2-.2-3.8-1.4.8z" fill="#D7C1B3"/><path d="M21.9 14.2l-1.5-.8-.1 3.8 3.5-.2-1.9-2.8z" fill="#D7C1B3"/><path d="M9.7 26.5l3.2-1.6-2.7-2.1-.5 3.7z" fill="#233447"/><path d="M19.1 24.9l3.2 1.6-.5-3.7-2.7 2.1z" fill="#233447"/><path d="M12.9 24.9l3.1.9 3.1-.9-2.7-2.2h-1l-2.5 2.2z" fill="#CD6116"/><path d="M22.3 17.2l-3.5.2.4 2.4 2.7-2.1.4-.5z" fill="#E4751F"/><path d="M9.7 17.2l.4.5 2.7 2.1.4-2.4-3.5-.2z" fill="#E4751F"/><path d="M16 17.6l-3.2-.2-.4 2.4 2.5-2.2h2.2l2.5 2.2-.4-2.4-3.2.2z" fill="#F6851B"/></svg>
+            </span>
+            <span class="w-name">MetaMask</span>
+          </div>
+          <span class="w-badge" id="badgeMm">Installed</span>
+        </button>
+
+        <!-- WalletConnect -->
+        <button type="button" class="wallet-opt-btn" data-wallet="walletconnect">
+          <div class="w-opt-left">
+            <span class="w-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#3B99FC"/><path d="M7.2 9.5a6.8 6.8 0 019.6 0l.3.3a.5.5 0 010 .7l-1.1 1.1a.3.3 0 01-.4 0l-.5-.5a4.7 4.7 0 00-6.4 0l-.5.5a.3.3 0 01-.4 0l-1.1-1.1a.5.5 0 010-.7l.5-.3zm12.3 2.7l1 1a.5.5 0 010 .7l-4.5 4.5a.5.5 0 01-.7 0l-3.3-3.3a.2.2 0 00-.3 0l-3.3 3.3a.5.5 0 01-.7 0L3.2 13.9a.5.5 0 010-.7l1-1a.5.5 0 01.7 0l3.3 3.3a.2.2 0 00.3 0l3.3-3.3a.5.5 0 01.7 0l3.3 3.3a.2.2 0 00.3 0l3.3-3.3a.5.5 0 01.8 0z" fill="#FFF"/></svg>
+            </span>
+            <span class="w-name">WalletConnect</span>
+          </div>
+        </button>
+
+        <!-- Phantom -->
+        <button type="button" class="wallet-opt-btn" data-wallet="phantom">
+          <div class="w-opt-left">
+            <span class="w-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#AB9FF2"/><path d="M18.8 13.4c-.4 2.8-2.6 4.9-5.4 4.9H7.6a1 1 0 01-1-1.2c.6-3 3-5.2 6-5.2h5.2a1 1 0 011 1.5zm-8.6-1.6a1.2 1.2 0 100-2.4 1.2 1.2 0 000 2.4z" fill="#FFF"/></svg>
+            </span>
+            <span class="w-name">Phantom</span>
+          </div>
+          <span class="w-ext-icon">&nearr;</span>
+        </button>
+
+        <!-- More Wallet Options Toggle -->
+        <button type="button" class="wallet-more-toggle" id="moreWalletsToggle">
+          <span>More Wallet Options</span>
+          <span id="moreWalletsArrow">&darr;</span>
+        </button>
+
+        <!-- More Wallets Expandable List -->
+        <div class="wallet-more-list" id="moreWalletsList" style="display: none;">
+          <!-- Coinbase Wallet -->
+          <button type="button" class="wallet-opt-btn" data-wallet="coinbase">
+            <div class="w-opt-left">
+              <span class="w-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#0052FF"/><rect x="7" y="7" width="10" height="10" rx="3" fill="#FFF"/><rect x="9.5" y="9.5" width="5" height="5" rx="1.5" fill="#0052FF"/></svg>
+              </span>
+              <span class="w-name">Coinbase Wallet</span>
+            </div>
+          </button>
+
+          <!-- Rabby Wallet -->
+          <button type="button" class="wallet-opt-btn" data-wallet="rabby">
+            <div class="w-opt-left">
+              <span class="w-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#8697FF"/><path d="M12 7c-2.8 0-5 2.2-5 5v3a1 1 0 001 1h8a1 1 0 001-1v-3c0-2.8-2.2-5-5-5zm-2 5a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2z" fill="#FFF"/></svg>
+              </span>
+              <span class="w-name">Rabby Wallet</span>
+            </div>
+          </button>
+
+          <!-- Injected / Default -->
+          <button type="button" class="wallet-opt-btn" data-wallet="injected">
+            <div class="w-opt-left">
+              <span class="w-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#221B15"/><path d="M7 12l3 3 7-7" stroke="#00FF66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="w-name">Browser Injected</span>
+            </div>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="foot">
     <div class="wrap foot-in">

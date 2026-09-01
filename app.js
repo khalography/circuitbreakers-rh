@@ -41,12 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Audio Toggle Button
   const audioToggle = document.getElementById('audioToggle');
-  audioToggle.addEventListener('click', () => {
-    audioEnabled = !audioEnabled;
-    document.getElementById('audioIcon').textContent = audioEnabled ? '🔊' : '🔇';
-    audioToggle.style.opacity = audioEnabled ? '1' : '0.5';
-    playClickSound(1000);
-  });
+  if (audioToggle) {
+    audioToggle.addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById('audioIcon');
+      if (icon) icon.textContent = audioEnabled ? '🔊' : '🔇';
+      audioToggle.style.opacity = audioEnabled ? '1' : '0.5';
+      playClickSound(1000);
+    });
+  }
 
   // Attach click sounds to all buttons
   document.querySelectorAll('.btn').forEach(btn => {
@@ -226,51 +229,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==========================================
-  // ENERGIZE & YIELD DESK INTERACTIONS
-  // ==========================================
-  let userFuseBalance = 3.0;
-  let totalYieldAccrued = 42.80;
-  let yield1892 = 24.85;
-  let yield407 = 0.0;
-  let is407Energized = false;
-
-  const energizeBtn407 = document.getElementById('energizeBtn407');
-  const fuseBalanceEl = document.getElementById('fuseBalance');
-  const totalAccruedYieldEl = document.getElementById('totalAccruedYield');
-  const claimBtn1892 = document.getElementById('claimBtn1892');
-  const claimAllYieldBtn = document.getElementById('claimAllYieldBtn');
-
-  // Energize Breaker #0407 Action
-  if (energizeBtn407) {
-    energizeBtn407.addEventListener('click', () => {
-      if (is407Energized) {
-        // Already energized: Action is Claim Dividend
-        if (yield407 <= 0.0) {
-          alert('No pending dividends to claim right now. Yield streams continuously from DEX trades.');
-          return;
-        }
-        totalYieldAccrued -= yield407;
-        alert(`⚡ Claimed +$${yield407.toFixed(2)} in stock dividends to your wallet!`);
-        yield407 = 0.0;
-        energizeBtn407.textContent = `CLAIM $0.00 DIVIDENDS ✓`;
-        totalAccruedYieldEl.textContent = `$${totalYieldAccrued.toFixed(2)} USD`;
-        claimAllYieldBtn.textContent = `Claim All Yield ($${totalYieldAccrued.toFixed(2)})`;
-        playClickSound(1200);
-        return;
-      }
-
-      if (userFuseBalance < 1.0) {
-        alert('Insufficient $FUSE balance. You need 1.0 $FUSE to energize a breaker.');
-        return;
-      }
-
-      // 1. Play High-Voltage Ignition Sound Effect
-      playClickSound(1800, 'sawtooth', 0.2);
   // ---------------------------------------------------------------------------
-  // WEB3 NAVBAR WALLET CONNECT (MetaMask, Rabby, Coinbase Wallet)
+  // WEB3 WALLET SELECTION MODAL LOGIC (OKX, MetaMask, WalletConnect, Phantom, etc.)
   // ---------------------------------------------------------------------------
   const navConnectBtn = document.getElementById('navConnectBtn');
+  const walletModalOverlay = document.getElementById('walletModalOverlay');
+  const closeWalletModalBtn = document.getElementById('closeWalletModal');
+  const moreWalletsToggle = document.getElementById('moreWalletsToggle');
+  const moreWalletsList = document.getElementById('moreWalletsList');
+  const moreWalletsArrow = document.getElementById('moreWalletsArrow');
   let currentNavAccount = null;
 
   function formatNavAddress(addr) {
@@ -278,15 +245,75 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
   }
 
-  async function connectNavWallet() {
+  function openWalletModal() {
+    if (!walletModalOverlay) return;
+    initAudio();
     playClickSound(900);
-    if (typeof window.ethereum === 'undefined') {
-      alert('No Web3 EVM wallet detected. Please install MetaMask, Rabby, or Coinbase Wallet.');
+    
+    // Check installed providers
+    const badgeOkx = document.getElementById('badgeOkx');
+    const badgeMm = document.getElementById('badgeMm');
+    if (badgeOkx) {
+      badgeOkx.style.display = (window.okxwallet) ? 'inline-block' : 'none';
+    }
+    if (badgeMm) {
+      badgeMm.style.display = (window.ethereum && window.ethereum.isMetaMask) ? 'inline-block' : 'none';
+    }
+
+    walletModalOverlay.classList.add('open');
+  }
+
+  function closeWalletModal() {
+    if (!walletModalOverlay) return;
+    walletModalOverlay.classList.remove('open');
+    playClickSound(600);
+  }
+
+  if (closeWalletModalBtn) {
+    closeWalletModalBtn.addEventListener('click', closeWalletModal);
+  }
+
+  if (walletModalOverlay) {
+    walletModalOverlay.addEventListener('click', (e) => {
+      if (e.target === walletModalOverlay) closeWalletModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && walletModalOverlay && walletModalOverlay.classList.contains('open')) {
+      closeWalletModal();
+    }
+  });
+
+  if (moreWalletsToggle && moreWalletsList) {
+    moreWalletsToggle.addEventListener('click', () => {
+      const isHidden = moreWalletsList.style.display === 'none';
+      moreWalletsList.style.display = isHidden ? 'flex' : 'none';
+      if (moreWalletsArrow) moreWalletsArrow.innerHTML = isHidden ? '&uarr;' : '&darr;';
+      playClickSound(700);
+    });
+  }
+
+  async function connectSpecificWallet(walletType) {
+    let provider = window.ethereum;
+    if (walletType === 'okx' && window.okxwallet) {
+      provider = window.okxwallet;
+    } else if (walletType === 'phantom' && window.phantom && window.phantom.ethereum) {
+      provider = window.phantom.ethereum;
+    }
+
+    if (!provider) {
+      if (walletType === 'walletconnect') {
+        alert('WalletConnect bridge initializing... Please scan QR code with your mobile wallet app.');
+        return;
+      }
+      alert(`No active extension detected for ${walletType.toUpperCase()}. Please make sure your wallet extension is installed and unlocked.`);
       return;
     }
 
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      playClickSound(900);
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         currentNavAccount = accounts[0];
         playClickSound(1200);
@@ -296,7 +323,6 @@ document.addEventListener('DOMContentLoaded', () => {
           navConnectBtn.classList.add('connected');
         }
 
-        // Autofill wallet address on registration form if present
         if (walletInput && !walletInput.value) {
           walletInput.value = currentNavAccount;
           state.walletAddress = currentNavAccount;
@@ -306,6 +332,16 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('Wallet connection rejected:', err);
     }
+  }
+
+  if (walletModalOverlay) {
+    walletModalOverlay.querySelectorAll('.wallet-opt-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const walletType = e.currentTarget.getAttribute('data-wallet');
+        closeWalletModal();
+        await connectSpecificWallet(walletType);
+      });
+    });
   }
 
   if (navConnectBtn) {
@@ -318,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
           playClickSound(600);
         }
       } else {
-        connectNavWallet();
+        openWalletModal();
       }
     });
   }

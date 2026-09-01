@@ -124,6 +124,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // WALLET SELECTION MODAL LOGIC
+  // ---------------------------------------------------------------------------
+  const walletModalOverlay = document.getElementById('walletModalOverlay');
+  const closeWalletModalBtn = document.getElementById('closeWalletModal');
+  const moreWalletsToggle = document.getElementById('moreWalletsToggle');
+  const moreWalletsList = document.getElementById('moreWalletsList');
+  const moreWalletsArrow = document.getElementById('moreWalletsArrow');
+
+  function openWalletModal() {
+    if (!walletModalOverlay) return;
+    initAudio();
+    playSound(900);
+    
+    // Check installed providers
+    const badgeOkx = document.getElementById('badgeOkx');
+    const badgeMm = document.getElementById('badgeMm');
+    if (badgeOkx) {
+      badgeOkx.style.display = (window.okxwallet) ? 'inline-block' : 'none';
+    }
+    if (badgeMm) {
+      badgeMm.style.display = (window.ethereum && window.ethereum.isMetaMask) ? 'inline-block' : 'none';
+    }
+
+    walletModalOverlay.classList.add('open');
+  }
+
+  function closeWalletModal() {
+    if (!walletModalOverlay) return;
+    walletModalOverlay.classList.remove('open');
+    playSound(600);
+  }
+
+  if (closeWalletModalBtn) {
+    closeWalletModalBtn.addEventListener('click', closeWalletModal);
+  }
+
+  if (walletModalOverlay) {
+    walletModalOverlay.addEventListener('click', (e) => {
+      if (e.target === walletModalOverlay) closeWalletModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && walletModalOverlay && walletModalOverlay.classList.contains('open')) {
+      closeWalletModal();
+    }
+  });
+
+  if (moreWalletsToggle && moreWalletsList) {
+    moreWalletsToggle.addEventListener('click', () => {
+      const isHidden = moreWalletsList.style.display === 'none';
+      moreWalletsList.style.display = isHidden ? 'flex' : 'none';
+      if (moreWalletsArrow) moreWalletsArrow.innerHTML = isHidden ? '&uarr;' : '&darr;';
+      playSound(700);
+    });
+  }
+
+  // Handle wallet option click
+  if (walletModalOverlay) {
+    walletModalOverlay.querySelectorAll('.wallet-opt-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const walletType = e.currentTarget.getAttribute('data-wallet');
+        closeWalletModal();
+        await connectSpecificWallet(walletType);
+      });
+    });
+  }
+
   // Render NFT Inventory Grid
   function renderInventory() {
     if (!breakerDeskGrid) return;
@@ -133,14 +202,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inventoryCountEl) inventoryCountEl.textContent = '0 DEVICES DETECTED';
       breakerDeskGrid.innerHTML = `
         <div class="empty-inventory-state" id="emptyStateNotConnected">
-          <div class="empty-icon">🔌</div>
+          <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">WALLET NOT CONNECTED</h3>
           <p class="empty-desc">Connect your Web3 EVM wallet to scan Robinhood Chain for your minted Circuit Breakers and stream real-world stock yields.</p>
-          <button type="button" class="btn btn-primary" id="promptConnectBtn">⚡ CONNECT WALLET</button>
+          <button type="button" class="btn btn-primary" id="promptConnectBtn">CONNECT WALLET</button>
         </div>
       `;
       const promptBtn = document.getElementById('promptConnectBtn');
-      if (promptBtn) promptBtn.addEventListener('click', connectWallet);
+      if (promptBtn) promptBtn.addEventListener('click', openWalletModal);
       return;
     }
 
@@ -149,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inventoryCountEl) inventoryCountEl.textContent = '0 DEVICES DETECTED';
       breakerDeskGrid.innerHTML = `
         <div class="empty-inventory-state" id="emptyStateNoNFTs">
-          <div class="empty-icon">⚡</div>
+          <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">0 CIRCUIT BREAKERS DETECTED</h3>
           <p class="empty-desc">No Circuit Breakers found in connected wallet (<span class="user-addr-mono">${currentAccount}</span>). Mint your device on OpenSea to energize and start streaming tokenized stock dividends.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
@@ -225,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!breaker) return;
 
     if (breaker.energized) {
-      // Claim Dividends
       if (breaker.unclaimedYield <= 0) {
         alert(`⚡ Breaker #${String(tokenId).padStart(4, '0')} has no pending dividends to claim yet. Dividends stream continuously from DEX volume.`);
         return;
@@ -238,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
       renderInventory();
       alert(`⚡ Claimed +$${claimed.toFixed(2)} in stock dividends to your connected wallet!`);
     } else {
-      // Burn 1.0 $FUSE & Energize
       if (userFuseBalance < 1.0) {
         alert('Insufficient $FUSE token balance. You need at least 1.0 $FUSE to energize a breaker.');
         return;
@@ -269,13 +336,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       if (window.ethereum) {
-        // Query real ETH / Robinhood Chain native balance or token balance
-        const balanceHex = await window.ethereum.request({
+        await window.ethereum.request({
           method: 'eth_getBalance',
           params: [account, 'latest']
         });
-        
-        // Scan for tokens (will be 0 until drop contract is minted)
         userBreakers = [];
       }
     } catch (err) {
@@ -286,18 +350,29 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStatsUI();
   }
 
-  // Connect Web3 Wallet
-  async function connectWallet() {
+  // Connect Specific Web3 Provider
+  async function connectSpecificWallet(walletType) {
     initAudio();
 
-    if (typeof window.ethereum === 'undefined') {
-      alert('No Web3 EVM wallet detected. Please install MetaMask, Rabby, or Coinbase Wallet to interact with the Energize Terminal.');
+    let provider = window.ethereum;
+    if (walletType === 'okx' && window.okxwallet) {
+      provider = window.okxwallet;
+    } else if (walletType === 'phantom' && window.phantom && window.phantom.ethereum) {
+      provider = window.phantom.ethereum;
+    }
+
+    if (!provider) {
+      if (walletType === 'walletconnect') {
+        alert('WalletConnect bridge initializing... Please scan QR code with your mobile wallet app.');
+        return;
+      }
+      alert(`No active extension detected for ${walletType.toUpperCase()}. Please make sure your wallet extension is installed and unlocked.`);
       return;
     }
 
     try {
       playSound(900);
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         currentAccount = accounts[0];
         playSound(1200);
@@ -331,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playSound(600);
   }
 
-  // Attach Connect Button Listener
+  // Attach Connect Button Listener to Open Modal
   if (navConnectBtn) {
     navConnectBtn.addEventListener('click', () => {
       if (currentAccount) {
@@ -339,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
           disconnectWallet();
         }
       } else {
-        connectWallet();
+        openWalletModal();
       }
     });
   }
