@@ -17,15 +17,15 @@
 
 ---
 
-## 🖥️ Multi-Page Frontend Architecture
+## 🖥️ Multi-Page Terminal Architecture
 
-The web application is structured across three dedicated, purpose-built interfaces:
+The application is structured across three dedicated on-chain interfaces:
 
-| Page | Path | Purpose |
+| Interface | File | Description |
 | :--- | :--- | :--- |
-| 🏠 **Launch Terminal** | [`index.html`](index.html) | High-converting landing page with 16-bit device showcase, social tasks verification, and whitelist ticket receipt generator. |
-| ⚡ **Energize & Yield DApp** | [`energize.html`](energize.html) | Full-screen Web3 DeFi dashboard where NFT holders connect wallets, view breaker inventories, burn `$FUSE` to energize, and claim live stock dividends. |
-| 📖 **Protocol Specs** | [`docs.html`](docs.html) | Technical documentation & whitepaper portal featuring sticky sidebar navigation, fee breakdown tables, rarity matrices, and FAQs. |
+| 🏠 **Launch Terminal** | [`index.html`](index.html) | Whitelist registration portal, 16-bit hardware showcase, and verification receipt engine. |
+| ⚡ **Energize & Yield DApp** | [`energize.html`](energize.html) | Full-screen Web3 DeFi dashboard to burn `$FUSE`, energize devices, and claim real-time stock yield streams. |
+| 📖 **Protocol Specs** | [`docs.html`](docs.html) | Technical documentation & whitepaper portal detailing the state machine, fee distribution formulas, and rarity weights. |
 
 ---
 
@@ -91,28 +91,3 @@ Every Circuit Breaker belongs to an authentic historical engineering tier with u
 * **Type-3: HV Transformer Breaker (10.0% / 333 Supply)** — $2.5\times$ Surge Shield (+50% Market Halt Bonus)
 * **Type-4: Tri-Phase Master Console (4.8% / 160 Supply)** — $5.0\times$ Grid Interconnect (Earns Across ALL Desks)
 * **Type-5: Edison Patent Prototype (0.2% / 7 Supply)** — $10.0\times$ Master Grid Skim (Direct Overall DEX Tax Cut)
-
----
-
-## 🚀 Local Development & Deployment
-
-### Run Locally
-```bash
-# Clone the repository
-git clone https://github.com/khalography/circuitbreakers-rh.git
-cd circuitbreakers-rh
-
-# Serve with any static web server (e.g. Python)
-python -m http.server 8080
-```
-Open `http://localhost:8080` in your browser.
-
-### Deploy on Vercel
-1. Go to [vercel.com/new](https://vercel.com/new).
-2. Select the `circuitbreakers-rh` repository.
-3. Click **Deploy** (zero build configuration required).
-
----
-
-## 📜 License
-MIT License. Circuit Breakers is a community-owned, fair-launch protocol.
