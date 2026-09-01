@@ -30,15 +30,16 @@
     <div class="wrap topbar-in">
       <a href="index.html" class="brand">CIRCUIT<span>BREAKERS</span></a>
       
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link">Mint</a>
+        <a href="energize.html" class="nav-link">Energize</a>
+        <a href="index.html#substations" class="nav-link">Substations</a>
+        <a href="docs.html" class="nav-link active">Docs</a>
+        <div class="mobile-only-drawer-item">
+          <span class="badge badge-chain">ROBINHOOD CHAIN</span>
+        </div>
+      </nav>
       <div class="topbar-right">
-        <nav class="nav-links" id="navLinks">
-          <a href="index.html#mintConsole" class="nav-link">Mint</a>
-          <a href="energize.html" class="nav-link">Energize &amp; Yield</a>
-          <a href="docs.html" class="nav-link active">Docs</a>
-          <div class="mobile-only-drawer-item">
-            <span class="badge badge-chain">ROBINHOOD CHAIN</span>
-          </div>
-        </nav>
         <div class="header-badges">
           <span class="badge badge-live"><i class="dot"></i> SPECS V1.0</span>
           <span class="badge badge-chain">ROBINHOOD CHAIN</span>
@@ -446,15 +447,41 @@
     </div>
   </div>
 
+  <!-- ACCOUNT & DISCONNECT MODAL -->
+  <div class="account-modal-overlay" id="accountModalOverlay">
+    <div class="account-modal-card">
+      <div class="account-modal-header">
+        <div class="wm-title-group">
+          <h3>CONNECTED WALLET</h3>
+          <p>Active Session</p>
+        </div>
+        <button type="button" class="wm-close-btn" id="closeAccountModal" aria-label="Close Modal">&times;</button>
+      </div>
+      
+      <div class="account-modal-body">
+        <div class="account-address-box">
+          <span class="acc-addr-text" id="modalAccountAddress">0x000...0000</span>
+          <button type="button" class="btn-copy-addr" id="copyAddressBtn" title="Copy Address">📋 Copy</button>
+        </div>
+        
+        <div class="account-actions">
+          <button type="button" class="btn-disconnect-wallet" id="disconnectWalletBtn">
+            🔌 DISCONNECT WALLET
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="foot">
     <div class="wrap foot-in">
       <span>CIRCUIT BREAKERS • FULLY ON-CHAIN ON ROBINHOOD CHAIN</span>
       <div class="foot-links">
         <a href="https://x.com/CircuitB_RH" target="_blank">Twitter / X</a>
-        <a href="https://opensea.io" target="_blank">OpenSea Mint</a>
-        <a href="index.html#mintConsole">Mint</a>
-        <a href="energize.html">Energize &amp; Yield</a>
+        <a href="https://opensea.io/collection/circuit-breakers-rh/overview" target="_blank">OpenSea Mint</a>
+        <a href="energize.html">Energize</a>
+        <a href="index.html#archetypes">Archetypes</a>
       </div>
     </div>
   </footer>

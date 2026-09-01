@@ -116,11 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
-  // WEB3 WALLET SELECTION MODAL LOGIC (OKX, MetaMask, WalletConnect, Phantom, etc.)
+  // WEB3 WALLET SELECTION & DISCONNECT MODAL LOGIC
   // ---------------------------------------------------------------------------
   const navConnectBtn = document.getElementById('navConnectBtn');
   const walletModalOverlay = document.getElementById('walletModalOverlay');
   const closeWalletModalBtn = document.getElementById('closeWalletModal');
+  const accountModalOverlay = document.getElementById('accountModalOverlay');
+  const closeAccountModalBtn = document.getElementById('closeAccountModal');
+  const disconnectWalletBtn = document.getElementById('disconnectWalletBtn');
+  const modalAccountAddress = document.getElementById('modalAccountAddress');
+  const copyAddressBtn = document.getElementById('copyAddressBtn');
   const moreWalletsToggle = document.getElementById('moreWalletsToggle');
   const moreWalletsList = document.getElementById('moreWalletsList');
   const moreWalletsArrow = document.getElementById('moreWalletsArrow');
@@ -155,8 +160,28 @@ document.addEventListener('DOMContentLoaded', () => {
     playClickSound(600);
   }
 
+  function openAccountModal() {
+    if (!accountModalOverlay || !currentNavAccount) return;
+    initAudio();
+    playClickSound(800);
+    if (modalAccountAddress) {
+      modalAccountAddress.textContent = currentNavAccount;
+    }
+    accountModalOverlay.classList.add('open');
+  }
+
+  function closeAccountModal() {
+    if (!accountModalOverlay) return;
+    accountModalOverlay.classList.remove('open');
+    playClickSound(600);
+  }
+
   if (closeWalletModalBtn) {
     closeWalletModalBtn.addEventListener('click', closeWalletModal);
+  }
+
+  if (closeAccountModalBtn) {
+    closeAccountModalBtn.addEventListener('click', closeAccountModal);
   }
 
   if (walletModalOverlay) {
@@ -165,11 +190,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (accountModalOverlay) {
+    accountModalOverlay.addEventListener('click', (e) => {
+      if (e.target === accountModalOverlay) closeAccountModal();
+    });
+  }
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && walletModalOverlay && walletModalOverlay.classList.contains('open')) {
-      closeWalletModal();
+    if (e.key === 'Escape') {
+      if (walletModalOverlay && walletModalOverlay.classList.contains('open')) closeWalletModal();
+      if (accountModalOverlay && accountModalOverlay.classList.contains('open')) closeAccountModal();
     }
   });
+
+  if (copyAddressBtn) {
+    copyAddressBtn.addEventListener('click', () => {
+      if (!currentNavAccount) return;
+      navigator.clipboard.writeText(currentNavAccount).then(() => {
+        copyAddressBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyAddressBtn.textContent = '📋 Copy'; }, 2000);
+      });
+      playClickSound(1100);
+    });
+  }
+
+  // Explicit Disconnect Action
+  function disconnectNavWallet() {
+    currentNavAccount = null;
+    localStorage.removeItem('cb_connected_wallet');
+    localStorage.removeItem('cb_wallet_type');
+    localStorage.setItem('cb_disconnected', 'true');
+
+    if (navConnectBtn) {
+      navConnectBtn.textContent = 'CONNECT WALLET';
+      navConnectBtn.classList.remove('connected');
+    }
+
+    closeAccountModal();
+    playClickSound(600);
+  }
+
+  if (disconnectWalletBtn) {
+    disconnectWalletBtn.addEventListener('click', disconnectNavWallet);
+  }
 
   if (moreWalletsToggle && moreWalletsList) {
     moreWalletsToggle.addEventListener('click', () => {
@@ -202,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         currentNavAccount = accounts[0];
+        localStorage.removeItem('cb_disconnected');
         localStorage.setItem('cb_connected_wallet', currentNavAccount);
         localStorage.setItem('cb_wallet_type', walletType || 'injected');
         playClickSound(1200);
@@ -210,20 +274,19 @@ document.addEventListener('DOMContentLoaded', () => {
           navConnectBtn.textContent = formatNavAddress(currentNavAccount);
           navConnectBtn.classList.add('connected');
         }
-
-        if (walletInput && !walletInput.value) {
-          walletInput.value = currentNavAccount;
-          state.walletAddress = currentNavAccount;
-          validateFormState();
-        }
       }
     } catch (err) {
       console.error('Wallet connection rejected:', err);
     }
   }
 
-  // Auto-Detect / Restore Wallet on Load
+  // Auto-Detect / Restore Wallet on Load (RESPECTS cb_disconnected)
   async function autoDetectNavWallet() {
+    // If the user explicitly disconnected, never auto-connect on reload!
+    if (localStorage.getItem('cb_disconnected') === 'true') {
+      return;
+    }
+
     const savedAccount = localStorage.getItem('cb_connected_wallet');
     const savedWalletType = localStorage.getItem('cb_wallet_type') || 'injected';
 
@@ -244,11 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navConnectBtn.textContent = formatNavAddress(currentNavAccount);
             navConnectBtn.classList.add('connected');
           }
-          if (walletInput && !walletInput.value) {
-            walletInput.value = currentNavAccount;
-            state.walletAddress = currentNavAccount;
-            validateFormState();
-          }
           return;
         }
       } catch (err) {
@@ -261,11 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (navConnectBtn) {
         navConnectBtn.textContent = formatNavAddress(currentNavAccount);
         navConnectBtn.classList.add('connected');
-      }
-      if (walletInput && !walletInput.value) {
-        walletInput.value = currentNavAccount;
-        state.walletAddress = currentNavAccount;
-        validateFormState();
       }
     }
   }
@@ -283,14 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (navConnectBtn) {
     navConnectBtn.addEventListener('click', () => {
       if (currentNavAccount) {
-        if (confirm(`Connected as ${currentNavAccount}.\n\nDo you want to disconnect?`)) {
-          currentNavAccount = null;
-          localStorage.removeItem('cb_connected_wallet');
-          localStorage.removeItem('cb_wallet_type');
-          navConnectBtn.textContent = 'CONNECT WALLET';
-          navConnectBtn.classList.remove('connected');
-          playClickSound(600);
-        }
+        openAccountModal();
       } else {
         openWalletModal();
       }
@@ -306,11 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
           navConnectBtn.textContent = formatNavAddress(currentNavAccount);
           navConnectBtn.classList.add('connected');
         }
-        if (walletInput && !walletInput.value) {
-          walletInput.value = currentNavAccount;
-          state.walletAddress = currentNavAccount;
-          validateFormState();
-        }
       } else {
         currentNavAccount = null;
         if (navConnectBtn) {
@@ -325,24 +366,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof window.ethereum !== 'undefined') {
     window.ethereum.on('accountsChanged', (accounts) => {
       if (!accounts || accounts.length === 0) {
-        currentNavAccount = null;
-        localStorage.removeItem('cb_connected_wallet');
-        localStorage.removeItem('cb_wallet_type');
-        if (navConnectBtn) {
-          navConnectBtn.textContent = 'CONNECT WALLET';
-          navConnectBtn.classList.remove('connected');
-        }
+        disconnectNavWallet();
       } else {
         currentNavAccount = accounts[0];
+        localStorage.removeItem('cb_disconnected');
         localStorage.setItem('cb_connected_wallet', currentNavAccount);
         if (navConnectBtn) {
           navConnectBtn.textContent = formatNavAddress(currentNavAccount);
           navConnectBtn.classList.add('connected');
-        }
-        if (walletInput && !walletInput.value) {
-          walletInput.value = currentNavAccount;
-          state.walletAddress = currentNavAccount;
-          validateFormState();
         }
       }
     });

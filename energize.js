@@ -221,9 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">0 CIRCUIT BREAKERS DETECTED</h3>
           <p class="empty-desc">No Circuit Breakers found in connected wallet (<span class="user-addr-mono">${currentAccount}</span>). Mint your device on OpenSea to energize and start streaming tokenized stock dividends.</p>
-          <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-            <a href="https://opensea.io" target="_blank" class="btn btn-primary">VIEW DROP ON OPENSEA &nearr;</a>
-            <button type="button" class="btn btn-ghost" id="refreshScanBtn">↻ Scan Wallet</button>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 14px;">
+            <button type="button" class="btn btn-ghost" id="refreshScanBtn" style="padding: 10px 22px; font-size: 13px;">↻ SCAN WALLET</button>
           </div>
         </div>
       `;
@@ -375,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         currentAccount = accounts[0];
+        localStorage.removeItem('cb_disconnected');
         localStorage.setItem('cb_connected_wallet', currentAccount);
         localStorage.setItem('cb_wallet_type', walletType || 'injected');
         playSound(1200);
@@ -391,8 +391,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Auto-Detect / Restore Wallet on Load
+  // Auto-Detect / Restore Wallet on Load (RESPECTS cb_disconnected)
   async function autoDetectWallet() {
+    if (localStorage.getItem('cb_disconnected') === 'true') {
+      return;
+    }
+
     const savedAccount = localStorage.getItem('cb_connected_wallet');
     const savedWalletType = localStorage.getItem('cb_wallet_type') || 'injected';
 
@@ -431,11 +435,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Account / Disconnect Modal Elements
+  const accountModalOverlay = document.getElementById('accountModalOverlay');
+  const closeAccountModalBtn = document.getElementById('closeAccountModal');
+  const disconnectWalletBtn = document.getElementById('disconnectWalletBtn');
+  const modalAccountAddress = document.getElementById('modalAccountAddress');
+  const copyAddressBtn = document.getElementById('copyAddressBtn');
+
+  function openAccountModal() {
+    if (!accountModalOverlay || !currentAccount) return;
+    initAudio();
+    playSound(800);
+    if (modalAccountAddress) {
+      modalAccountAddress.textContent = currentAccount;
+    }
+    accountModalOverlay.classList.add('open');
+  }
+
+  function closeAccountModal() {
+    if (!accountModalOverlay) return;
+    accountModalOverlay.classList.remove('open');
+    playSound(600);
+  }
+
+  if (closeAccountModalBtn) {
+    closeAccountModalBtn.addEventListener('click', closeAccountModal);
+  }
+
+  if (accountModalOverlay) {
+    accountModalOverlay.addEventListener('click', (e) => {
+      if (e.target === accountModalOverlay) closeAccountModal();
+    });
+  }
+
+  if (copyAddressBtn) {
+    copyAddressBtn.addEventListener('click', () => {
+      if (!currentAccount) return;
+      navigator.clipboard.writeText(currentAccount).then(() => {
+        copyAddressBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyAddressBtn.textContent = '📋 Copy'; }, 2000);
+      });
+      playSound(1100);
+    });
+  }
+
   // Disconnect Wallet / Switch
   function disconnectWallet() {
     currentAccount = null;
     localStorage.removeItem('cb_connected_wallet');
     localStorage.removeItem('cb_wallet_type');
+    localStorage.setItem('cb_disconnected', 'true');
     userFuseBalance = 0.0;
     totalYieldAccrued = 0.0;
     userBreakers = [];
@@ -445,18 +494,21 @@ document.addEventListener('DOMContentLoaded', () => {
       navConnectBtn.classList.remove('connected');
     }
 
+    closeAccountModal();
     updateStatsUI();
     renderInventory();
     playSound(600);
+  }
+
+  if (disconnectWalletBtn) {
+    disconnectWalletBtn.addEventListener('click', disconnectWallet);
   }
 
   // Attach Connect Button Listener to Open Modal
   if (navConnectBtn) {
     navConnectBtn.addEventListener('click', () => {
       if (currentAccount) {
-        if (confirm(`Connected as ${currentAccount}.\n\nDo you want to disconnect?`)) {
-          disconnectWallet();
-        }
+        openAccountModal();
       } else {
         openWalletModal();
       }
@@ -502,6 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
         disconnectWallet();
       } else {
         currentAccount = accounts[0];
+        localStorage.removeItem('cb_disconnected');
         localStorage.setItem('cb_connected_wallet', currentAccount);
         if (navConnectBtn) {
           navConnectBtn.textContent = formatAddress(currentAccount);
