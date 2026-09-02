@@ -2127,6 +2127,22 @@ input[type="text"]:focus, input[type="url"]:focus {
   margin-left: 15px;
 }
 
+.foot-disclaimer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-align: center;
+  width: 100%;
+}
+
+.foot-disclaimer p {
+  margin: 0 auto;
+  max-width: 960px;
+}
+
 /* TOPBAR LAYOUT */
 .topbar-right {
   display: flex;

@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="empty-inventory-state" id="emptyStateNoNFTs">
           <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">0 CIRCUIT BREAKERS DETECTED</h3>
-          <p class="empty-desc">No Circuit Breakers found in connected wallet (<span class="user-addr-mono">${currentAccount}</span>). Mint your device on OpenSea to energize and start streaming tokenized stock dividends.</p>
+          <p class="empty-desc">No Circuit Breakers found in connected wallet (<span class="user-addr-mono">${escapeHtml(currentAccount)}</span>). Mint your device on OpenSea to energize and start streaming tokenized stock dividends.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 14px;">
             <button type="button" class="btn btn-ghost" id="refreshScanBtn" style="padding: 10px 22px; font-size: 13px;">↻ SCAN WALLET</button>
           </div>
@@ -243,38 +243,44 @@ document.addEventListener('DOMContentLoaded', () => {
     let html = '';
     userBreakers.forEach(breaker => {
       const isEnergized = breaker.energized;
+      const safeId = escapeHtml(String(breaker.tokenId));
+      const paddedId = escapeHtml(String(breaker.tokenId).padStart(4, '0'));
+      const safeTier = escapeHtml(breaker.tierName || 'Type-1 Single-Phase');
+      const safeMult = escapeHtml(breaker.multiplier || '1.0x');
+      const safeImg = escapeHtml(breaker.image || 'assets/type1.jpg');
+
       html += `
-        <div class="breaker-desk-card ${isEnergized ? 'energized' : ''}" id="breakerCard${breaker.tokenId}">
+        <div class="breaker-desk-card ${isEnergized ? 'energized' : ''}" id="breakerCard${safeId}">
           <div class="bd-head">
-            <span class="bd-id">BREAKER #${String(breaker.tokenId).padStart(4, '0')}</span>
-            <span class="bd-badge ${isEnergized ? 'badge-energized' : 'badge-tripped'}" id="badge${breaker.tokenId}">
+            <span class="bd-id">BREAKER #${paddedId}</span>
+            <span class="bd-badge ${isEnergized ? 'badge-energized' : 'badge-tripped'}" id="badge${safeId}">
               ${isEnergized ? 'ENERGIZED 🟢' : 'TRIPPED / UNLIT 🔴'}
             </span>
           </div>
-          <div class="bd-art-wrap ${isEnergized ? 'bd-art-energized' : ''}" id="artWrap${breaker.tokenId}">
-            <img src="${breaker.image || 'assets/type1.jpg'}" alt="Breaker ${breaker.tokenId}" class="bd-img" id="img${breaker.tokenId}">
-            <div class="switch-status ${isEnergized ? 'switch-active' : ''}" id="switch${breaker.tokenId}">
+          <div class="bd-art-wrap ${isEnergized ? 'bd-art-energized' : ''}" id="artWrap${safeId}">
+            <img src="${safeImg}" alt="Breaker ${safeId}" class="bd-img" id="img${safeId}">
+            <div class="switch-status ${isEnergized ? 'switch-active' : ''}" id="switch${safeId}">
               ${isEnergized ? '[ CIRCUIT CLOSED // 125V ACTIVE ]' : '[ CIRCUIT OPEN // 0V ]'}
             </div>
           </div>
           <div class="bd-specs">
             <div class="spec-row">
               <span>Model Tier:</span>
-              <strong>${breaker.tierName || 'Type-1 Single-Phase'}</strong>
+              <strong>${safeTier}</strong>
             </div>
             <div class="spec-row">
               <span>Yield Multiplier:</span>
-              <strong class="val-cyan">${breaker.multiplier || '1.0x'} Base Weight</strong>
+              <strong class="val-cyan">${safeMult} Base Weight</strong>
             </div>
             <div class="spec-row">
               <span>Current Status:</span>
-              <span id="yieldStatus${breaker.tokenId}" class="${isEnergized ? 'val-amber' : 'text-dim'}">
+              <span id="yieldStatus${safeId}" class="${isEnergized ? 'val-amber' : 'text-dim'}">
                 ${isEnergized ? `<strong>+$${breaker.unclaimedYield.toFixed(2)} ($NVDA • $HOOD • T-Bills)</strong>` : 'No Yield (Unlit)'}
               </span>
             </div>
           </div>
           <div class="bd-action">
-            <button type="button" class="btn ${isEnergized ? 'btn-accent' : 'btn-primary'} btn-full energize-card-btn" data-token-id="${breaker.tokenId}">
+            <button type="button" class="btn ${isEnergized ? 'btn-accent' : 'btn-primary'} btn-full energize-card-btn" data-token-id="${safeId}">
               ${isEnergized ? `CLAIM $${breaker.unclaimedYield.toFixed(2)} DIVIDENDS ✓` : '⚡ BURN 1.0 $FUSE & ENERGIZE'}
             </button>
           </div>
@@ -329,6 +335,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // SECURITY & VALIDATION HELPERS
+  // ---------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function isValidAddress(addr) {
+    return typeof addr === 'string' && /^0x[a-fA-F0-9]{40}$/.test(addr);
+  }
+
+  function isValidTokenId(id) {
+    const num = Number(id);
+    return Number.isInteger(num) && num >= 0 && num <= 10000;
+  }
+
+  // Enforce Connected Network is Robinhood Chain (4663 / 0x1237)
+  async function ensureRobinhoodChain() {
+    if (!window.ethereum) return false;
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      if (chainId === '0x1237' || parseInt(chainId, 16) === 4663) {
+        return true;
+      }
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x1237' }]
+        });
+        return true;
+      } catch (switchErr) {
+        if (switchErr.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x1237',
+              chainName: 'Robinhood Chain',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://rpc.robinhood.com'],
+              blockExplorerUrls: ['https://explorer.robinhood.com']
+            }]
+          });
+          return true;
+        }
+        throw switchErr;
+      }
+    } catch (err) {
+      console.warn('Network switch declined or failed:', err);
+      alert('Security Notice: Please switch your connected wallet to Robinhood Chain (Chain ID: 4663) to proceed.');
+      return false;
+    }
+  }
+
   // ABI Helpers for standard EVM RPC encoding/decoding
   function pad32(val) {
     let clean = String(val);
@@ -337,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function ethCall(to, data) {
-    if (!window.ethereum) return null;
+    if (!window.ethereum || !isValidAddress(to)) return null;
     try {
       return await window.ethereum.request({
         method: 'eth_call',
@@ -351,8 +416,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle Card Action (Burn to Energize or Claim Yield)
   async function handleBreakerAction(tokenId) {
+    if (!isValidTokenId(tokenId)) {
+      console.warn('Invalid token ID:', tokenId);
+      return;
+    }
+
     const breaker = userBreakers.find(b => b.tokenId === tokenId);
     if (!breaker || !currentAccount || !window.ethereum) return;
+    if (!isValidAddress(currentAccount)) return;
+
+    // Security Gate: Ensure wallet is on Robinhood Chain
+    const isCorrectChain = await ensureRobinhoodChain();
+    if (!isCorrectChain) return;
 
     if (breaker.energized) {
       // Claim Dividends from Vault Contract
@@ -390,14 +465,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const allowRes = await ethCall(CONTRACTS.FUSE, allowData);
         const currentAllowance = (allowRes && allowRes !== '0x') ? BigInt(allowRes) : 0n;
 
-        const requiredCost = 1000000000000000000n; // 1.0 ether (1e18)
+        const requiredCost = 1000000000000000000n; // Exact 1.0 $FUSE (1 ether)
 
         if (currentAllowance < requiredCost) {
-          // Trigger approve(spender, amount): selector 0x095ea7b3
-          const approveAmount = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+          // SECURITY REFACTOR: ONLY APPROVE EXACT REQUIRED AMOUNT (1.0 $FUSE)
+          // Eliminates unlimited token approval drainer signatures
+          const approveAmount = pad32(requiredCost.toString(16));
           const approveData = '0x095ea7b3' + pad32(CONTRACTS.VAULT) + approveAmount;
           
-          alert('⚡ Step 1/2: Please approve $FUSE spending for the Yield Vault in your wallet.');
+          alert('⚡ Step 1/2: Please approve spending of 1.0 $FUSE for the Yield Vault.');
           const approveTx = await window.ethereum.request({
             method: 'eth_sendTransaction',
             params: [{
@@ -406,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
               data: approveData
             }]
           });
-          console.log('Approval TX:', approveTx);
+          console.log('Safe Approval TX:', approveTx);
         }
 
         // 2. Call burnAndEnergize(tokenId): selector 0xdb7a0478

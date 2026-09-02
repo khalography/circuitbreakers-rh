@@ -137,8 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const moreWalletsArrow = document.getElementById('moreWalletsArrow');
   let currentNavAccount = null;
 
+  // Security: Validate Ethereum Address
+  function isValidAddress(addr) {
+    return typeof addr === 'string' && /^0x[a-fA-F0-9]{40}$/.test(addr);
+  }
+
   function formatNavAddress(addr) {
-    if (!addr) return 'CONNECT WALLET';
+    if (!isValidAddress(addr)) return 'CONNECT WALLET';
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
   }
 
@@ -269,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       playClickSound(900);
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      if (accounts && accounts.length > 0) {
+      if (accounts && accounts.length > 0 && isValidAddress(accounts[0])) {
         currentNavAccount = accounts[0];
         localStorage.removeItem('cb_disconnected');
         localStorage.setItem('cb_connected_wallet', currentNavAccount);
@@ -306,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (provider) {
       try {
         const accounts = await provider.request({ method: 'eth_accounts' });
-        if (accounts && accounts.length > 0) {
+        if (accounts && accounts.length > 0 && isValidAddress(accounts[0])) {
           currentNavAccount = accounts[0];
           localStorage.setItem('cb_connected_wallet', currentNavAccount);
           if (navConnectBtn) {
@@ -320,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    if (savedAccount) {
+    if (savedAccount && isValidAddress(savedAccount)) {
       currentNavAccount = savedAccount;
       if (navConnectBtn) {
         navConnectBtn.textContent = formatNavAddress(currentNavAccount);
