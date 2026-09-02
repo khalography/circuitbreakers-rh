@@ -39,17 +39,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Audio Toggle
+  // Audio Toggle Buttons (Desktop & Mobile Drawer)
   const audioToggle = document.getElementById('audioToggle');
-  if (audioToggle) {
-    audioToggle.addEventListener('click', () => {
-      audioEnabled = !audioEnabled;
-      const icon = document.getElementById('audioIcon');
-      if (icon) icon.textContent = audioEnabled ? '🔊' : '🔇';
-      audioToggle.style.opacity = audioEnabled ? '1' : '0.5';
-      playSound(1000);
-    });
+  const mobileAudioToggle = document.getElementById('mobileAudioToggle');
+
+  function toggleAudio() {
+    audioEnabled = !audioEnabled;
+    const icon = document.getElementById('audioIcon');
+    const mobIcon = document.getElementById('mobileAudioIcon');
+    if (icon) icon.textContent = audioEnabled ? '🔊' : '🔇';
+    if (mobIcon) mobIcon.textContent = audioEnabled ? '🔊' : '🔇';
+    if (audioToggle) audioToggle.style.opacity = audioEnabled ? '1' : '0.5';
+    if (mobileAudioToggle) mobileAudioToggle.style.opacity = audioEnabled ? '1' : '0.5';
+    playSound(1000);
   }
+
+  if (audioToggle) audioToggle.addEventListener('click', toggleAudio);
+  if (mobileAudioToggle) mobileAudioToggle.addEventListener('click', toggleAudio);
 
   // Mobile Hamburger Menu Toggle
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
