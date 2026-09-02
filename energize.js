@@ -433,8 +433,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Claim Dividends from Vault Contract
       try {
         playSound(1300);
-        // claimYield(uint256 tokenId): selector 0x40bd2e23
-        const claimData = '0x40bd2e23' + pad32(tokenId.toString(16));
+        // claimDividends(uint256 tokenId): selector 0xbd7047c4
+        const claimData = '0xbd7047c4' + pad32(tokenId.toString(16));
         const txHash = await window.ethereum.request({
           method: 'eth_sendTransaction',
           params: [{
@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playSound(750);
     if (inventoryCountEl) inventoryCountEl.textContent = 'SCANNING CHAIN...';
 
-    if (!window.ethereum || !account) {
+    if (!window.ethereum || !isValidAddress(account)) {
       userBreakers = [];
       renderInventory();
       updateStatsUI();
@@ -582,6 +582,16 @@ document.addEventListener('DOMContentLoaded', () => {
               const energizedRes = await ethCall(CONTRACTS.VAULT, energizedData);
               const isEnergized = energizedRes ? (BigInt(energizedRes) > 0n) : false;
 
+              // Query getPendingYield(uint256): selector 0x16e63fea
+              let pendingDividendsEth = 0.0;
+              if (isEnergized) {
+                const yieldData = '0x16e63fea' + pad32(tokenId.toString(16));
+                const yieldRes = await ethCall(CONTRACTS.VAULT, yieldData);
+                if (yieldRes && yieldRes !== '0x') {
+                  pendingDividendsEth = Number(BigInt(yieldRes)) / 1e18;
+                }
+              }
+
               const tierInfo = getBreakerTier(tokenId);
 
               detectedBreakers.push({
@@ -590,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tierName: tierInfo.tierName,
                 multiplier: tierInfo.multiplier,
                 image: tierInfo.image,
-                unclaimedYield: 0.0
+                unclaimedYield: pendingDividendsEth
               });
             }
           }
@@ -600,6 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       userBreakers = detectedBreakers;
+      totalYieldAccrued = detectedBreakers.reduce((acc, b) => acc + (b.unclaimedYield || 0), 0);
     } catch (err) {
       console.warn('Holdings scan completed with default state:', err);
     }
