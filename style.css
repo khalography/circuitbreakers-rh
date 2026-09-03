@@ -142,6 +142,96 @@ body {
   border-bottom-color: var(--cyan-electric);
 }
 
+/* NAV DROPDOWN (ENERGIZE: YIELD & BURN) */
+.nav-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.nav-caret {
+  font-size: 10px;
+  margin-left: 4px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+
+.nav-dropdown:hover .nav-caret,
+.nav-dropdown.open .nav-caret,
+.nav-dropdown:focus-within .nav-caret {
+  transform: rotate(180deg);
+  color: var(--cyan-electric);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0B0E14;
+  border: 2px solid #000;
+  border-top: 3px solid var(--cyan-electric);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.85), var(--shadow-pixel);
+  min-width: 175px;
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 999;
+}
+
+.nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown.open .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  display: flex;
+}
+
+.nav-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  text-decoration: none;
+  background: #11151F;
+  border: 1px solid #1C2331;
+  transition: all 0.15s ease;
+}
+
+.nav-dropdown-item:hover {
+  background: #182030;
+  border-color: var(--cyan-electric);
+  transform: translateX(2px);
+}
+
+.dropdown-item-title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--paper-cream);
+  letter-spacing: 0.5px;
+}
+
+.nav-dropdown-item:hover .dropdown-item-title {
+  color: var(--cyan-electric);
+}
+
+.dropdown-item-desc {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
 .header-badges {
   display: flex;
   gap: 8px;
@@ -1225,6 +1315,63 @@ input[type="text"]:focus, input[type="url"]:focus {
   text-decoration: underline;
 }
 
+/* TOKENOMICS SPECIFICATION TABLE */
+.tokenomics-table-wrap {
+  overflow-x: auto;
+  border: 2px solid #000;
+  box-shadow: var(--shadow-pixel);
+  background: var(--bg-panel);
+  margin-top: 20px;
+}
+
+.tokenomics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  text-align: left;
+}
+
+.tokenomics-table th {
+  background: var(--bg-panel-light);
+  color: var(--amber-caution);
+  font-family: var(--font-pixel);
+  padding: 14px 18px;
+  border-bottom: 2px solid #000;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.tokenomics-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--bg-panel-light);
+  color: var(--paper-cream);
+  line-height: 1.5;
+}
+
+.tokenomics-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tokenomics-table tbody tr:hover {
+  background: rgba(255, 196, 0, 0.03);
+}
+
+.tokenomics-table td:nth-child(1) {
+  color: var(--paper-cream);
+  font-weight: 700;
+}
+
+.tokenomics-table td:nth-child(2) {
+  color: var(--amber-caution);
+  font-weight: 700;
+}
+
+.tokenomics-table td:nth-child(3) {
+  color: var(--ink-soft);
+}
+
+
 /* TOPBAR NAV LINKS */
 .nav-links {
   display: flex;
@@ -1793,6 +1940,53 @@ input[type="text"]:focus, input[type="url"]:focus {
   color: var(--cyan-electric);
   word-break: break-all;
 }
+
+.sign-security-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 196, 0, 0.08);
+  border: 1px solid var(--amber-caution);
+  color: var(--amber-caution);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 8px 16px;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+.btn-sign {
+  background: var(--amber-caution) !important;
+  color: var(--ink-dark) !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 12.5px !important;
+  padding: 12px 26px !important;
+  border: 2px solid #000 !important;
+  box-shadow: var(--shadow-pixel) !important;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.btn-sign:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 3px 0px #000 !important;
+}
+
+.scanning-radar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 229, 255, 0.2);
+  border-top-color: var(--cyan-electric);
+  animation: radarSpin 0.9s linear infinite;
+  margin-bottom: 18px;
+}
+
+@keyframes radarSpin {
+  to { transform: rotate(360deg); }
+}
+
 
 .btn-connect {
   background: var(--paper-cream);

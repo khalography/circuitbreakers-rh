@@ -32,7 +32,19 @@
       
       <nav class="nav-links" id="navLinks">
         <a href="index.html" class="nav-link">Mint</a>
-        <a href="energize.html" class="nav-link">Energize</a>
+        <div class="nav-dropdown">
+          <a href="energize.html" class="nav-link">Energize <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown-menu">
+            <a href="energize.html#yield" class="nav-dropdown-item">
+              <span class="dropdown-item-title">YIELD</span>
+              <span class="dropdown-item-desc">Hardware &amp; Dividends</span>
+            </a>
+            <a href="energize.html#workshop" class="nav-dropdown-item">
+              <span class="dropdown-item-title">BURN</span>
+              <span class="dropdown-item-desc">The Forge &amp; Overclock</span>
+            </a>
+          </div>
+        </div>
         <a href="index.html#substations" class="nav-link">Substations</a>
         <a href="docs.html" class="nav-link active">Docs</a>
         <div class="mobile-only-drawer-item">
@@ -113,7 +125,7 @@
             <span class="panel-num">#01</span>
           </div>
           <p>
-            <strong>Circuit Breakers</strong> is a mechanical 16-bit industrial hardware collection of 3,333 devices on <strong>Robinhood Chain</strong> that stream real-world tokenized stock dividends ($NVDA, $HOOD, $TSLA) and USDG directly into holders' wallets. All minted devices start in <strong>Standby</strong> earning a baseline share of the <strong>10% Standby Pool</strong>. To access the <strong>90% High-Voltage Yield Grid</strong>, holders lock <strong>0.25 $FUSE</strong> in Vault escrow (refundable at any time). Capping the lock cost at 0.25 $FUSE mathematically guarantees that even if 100% of all 3,333 Breakers are energized simultaneously, a maximum of 25.0% of the 3,333 $FUSE supply is ever locked (833.25 tokens), guaranteeing that <strong>at least 75.0% (2,499.75 $FUSE) remains permanently floating for active DEX trading and liquidity</strong>. Every DEX swap captures a permanent 3.0% fee: <strong>2.30% to the Yield Vault</strong>, <strong>0.60% permanently locked liquidity</strong>, and <strong>0.10% (0.001) burned</strong>. Furthermore, holders can permanently incinerate duplicate devices in the <strong>Substation Workshop</strong> via <em>The Forge</em> (melt 3 Type-1s to forge a Type-2) or the <em>Overclock Lab</em> (sacrifice auxiliary devices for permanent multiplier boosts).
+            <strong>Circuit Breakers</strong> is a mechanical 16-bit industrial hardware collection of 3,333 devices on <strong>Robinhood Chain</strong> that stream real-world tokenized stock dividends ($NVDA, $HOOD, $TSLA) and USDG directly into holders' wallets. All minted devices start in <strong>Standby</strong> earning a baseline share of the <strong>10% Standby Pool</strong>. To access the <strong>90% High-Voltage Yield Grid</strong>, holders lock <strong>0.25 $FUSE</strong> in Vault escrow (refundable at any time). Capping the lock cost at 0.25 $FUSE mathematically guarantees that even if 100% of all 3,333 Breakers are energized simultaneously, a maximum of 25.0% of the 3,333 $FUSE supply is ever locked (833.25 tokens), guaranteeing that <strong>at least 75.0% (2,499.75 $FUSE) remains permanently floating for active DEX trading and liquidity</strong>. Every DEX swap captures a permanent 3.0% fee: <strong>2.30% to the Yield Vault</strong>, <strong>0.60% permanently locked liquidity</strong>, and <strong>0.10% (0.001) burned</strong>. Furthermore, holders can permanently incinerate duplicate devices in the <strong>Substation Workshop</strong> via <em>The Forge</em> (melt 2 Type-1s to forge a Type-2 at 2.25&times;, or melt 2 Type-2s to forge a Type-3 at 5.0&times;) or the <em>Overclock Lab</em> (sacrifice auxiliary devices for permanent multiplier boosts).
           </p>
         </article>
 
@@ -138,7 +150,7 @@
             </div>
             <div class="glossary-item">
               <dt>The Forge (Tier Evolution)</dt>
-              <dd>Permanently melt 3 Type-1 Single-Phase Breakers to forge 1 rare Type-2 Dual Relay Breaker (1.5&times; multiplier), incinerating the 3 input devices to the dead address.</dd>
+              <dd>Permanently melt 2 Type-1 Single-Phase Breakers to forge 1 rare Type-2 Dual Relay Breaker (2.25&times; multiplier, +0.25&times; net yield gain), or melt 2 Type-2 Dual Relays to forge 1 legendary Type-3 HV Transformer (5.0&times; multiplier + Surge Shield), incinerating the 2 input devices to the dead address.</dd>
             </div>
             <div class="glossary-item">
               <dt>Overclock Lab (Component Sacrifice)</dt>
@@ -209,14 +221,14 @@
                 <tr>
                   <td><strong>Type-2: Dual-Circuit Relay</strong></td>
                   <td>833 (25.0%)</td>
-                  <td><span class="tag-weight">1.5&times;</span></td>
-                  <td>+50% Higher Dividend Allocation (+0.50x Overclock Value)</td>
+                  <td><span class="tag-weight">2.25&times;</span></td>
+                  <td>+125% Higher Allocation (+0.25x net gain via 2-for-1 Forge, +0.50x Overclock Value)</td>
                 </tr>
                 <tr>
                   <td><strong>Type-3: HV Transformer Breaker</strong></td>
                   <td>500 (15.0%)</td>
-                  <td><span class="tag-weight">2.5&times;</span></td>
-                  <td>Surge Shield (+50% Market Halt Volatility Bonus)</td>
+                  <td><span class="tag-weight">5.0&times;</span></td>
+                  <td>Surge Shield (+50% Market Halt Bonus, +0.50x net gain via 2-for-1 Forge)</td>
                 </tr>
               </tbody>
             </table>
@@ -308,7 +320,7 @@
               </div>
               <h4 style="font-family: var(--font-pixel); font-size: 13px; color: var(--paper-cream); margin-bottom: 6px;">Tier Evolution</h4>
               <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.5;">
-                Melt <strong>3 Type-1 Single-Phase Breakers</strong> to forge <strong>1 rare Type-2 Dual Relay Breaker</strong> (1.5&times; multiplier). The 3 input Breakers are permanently incinerated to <code>0x...dEaD</code>, shrinking common floor supply while upgrading yield tier.
+                Melt <strong>2 Type-1 Breakers</strong> (2.0&times; combined) to forge <strong>1 Type-2 Dual Relay</strong> (<strong>2.25&times;</strong> multiplier, +0.25&times; net yield gain), or melt <strong>2 Type-2 Breakers</strong> (4.5&times; combined) to forge <strong>1 Type-3 HV Transformer</strong> (<strong>5.0&times;</strong> multiplier + Surge Shield). Input devices are permanently incinerated to <code>0x...dEaD</code>, shrinking total NFT supply while providing genuine net yield accretion and 50% savings on escrow locking.
               </p>
             </div>
             <div class="sub-card-featured">
@@ -364,6 +376,10 @@
             <details class="faq-item">
               <summary>What is the collection allocation?</summary>
               <p>Circuit Breakers has a hard cap of 3,333 devices on Robinhood Chain: <strong>3,300 devices (99.0%)</strong> for the public mint on OpenSea at 0.01 ETH, and <strong>33 devices (1.0%)</strong> reserved for the core team development and ecosystem vault.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How does the Energize Desk verify wallet ownership?</summary>
+              <p>When connecting your wallet to the Energize terminal, the dApp prompts for a one-time cryptographic signature (<strong>Verify Ownership</strong> via <code>personal_sign</code>). This authentication step is completely gasless (0 ETH cost), purely read-only, and incapable of transferring assets or approving contract allowances. It securely confirms that the active user controls the private key for the connected address before initiating real-time Robinhood Chain inventory scanning and dividend streaming.</p>
             </details>
             <details class="faq-item">
               <summary>What network is Circuit Breakers deployed on?</summary>

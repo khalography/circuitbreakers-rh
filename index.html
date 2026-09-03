@@ -33,7 +33,19 @@
       
       <nav class="nav-links" id="navLinks">
         <a href="index.html" class="nav-link active">Mint</a>
-        <a href="energize.html" class="nav-link">Energize</a>
+        <div class="nav-dropdown">
+          <a href="energize.html" class="nav-link">Energize <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown-menu">
+            <a href="energize.html#yield" class="nav-dropdown-item">
+              <span class="dropdown-item-title">YIELD</span>
+              <span class="dropdown-item-desc">Hardware &amp; Dividends</span>
+            </a>
+            <a href="energize.html#workshop" class="nav-dropdown-item">
+              <span class="dropdown-item-title">BURN</span>
+              <span class="dropdown-item-desc">The Forge &amp; Overclock</span>
+            </a>
+          </div>
+        </div>
         <a href="index.html#substations" class="nav-link">Substations</a>
         <a href="docs.html" class="nav-link">Docs</a>
         <div class="mobile-only-drawer-item">
@@ -270,7 +282,7 @@
             </tr>
             <tr>
               <td><strong>Public Mint Allocation</strong></td>
-              <td><span class="val-cyan">3,300 Units (99.0%)</span></td>
+              <td><span class="val-amber">3,300 Units (99.0%)</span></td>
               <td>Public drop via OpenSea on Robinhood Chain</td>
             </tr>
             <tr>
@@ -285,17 +297,17 @@
             </tr>
             <tr>
               <td><strong>DEX Swap Fee Stream</strong></td>
-              <td><strong>3.0% Total Fee</strong></td>
+              <td><span class="val-amber">3.0% Total Fee</span></td>
               <td>2.30% to Vault (90/10 Pool) • 0.60% LP • 0.10% Burn</td>
             </tr>
             <tr>
               <td><strong>Lock-to-Energize</strong></td>
-              <td><strong>0.25 $FUSE Escrowed</strong></td>
+              <td><span class="val-amber">0.25 $FUSE Escrowed</span></td>
               <td>90% pool to Energized • 10% pool to Standby (Max 25% supply locked)</td>
             </tr>
             <tr>
               <td><strong>Claim Cadence</strong></td>
-              <td><strong>Continuous / Instant</strong></td>
+              <td><span class="val-amber">Continuous / Instant</span></td>
               <td>No lockups, zero unbonding delay, paid in tokenized stocks &amp; USDG</td>
             </tr>
           </tbody>

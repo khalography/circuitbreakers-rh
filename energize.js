@@ -89,11 +89,20 @@ document.addEventListener('DOMContentLoaded', () => {
   let globalLockedCount = 0;
   let globalNftsBurnedCount = 0;
   let userBreakers = []; // Real detected user NFTs
+  let isWalletVerified = false; // Whether current wallet signed ownership confirmation
+  let isScanningHoldings = false; // Whether background chain query is in progress
+
+  function checkWalletVerification(account) {
+    if (!account) return false;
+    const key = 'cb_wallet_signed_' + account.toLowerCase();
+    return (localStorage.getItem(key) === 'true') || (sessionStorage.getItem(key) === 'true');
+  }
 
   // Workshop Active States
-  let forgeSelectedTokenIds = []; // Up to 3 Type-1 tokens
-  let ocMasterTokenId = null;     // Selected master device
-  let ocSacrificeTokenIds = [];   // Selected devices to incinerate
+  let currentForgeRecipe = 't1_to_t2'; // 't1_to_t2' (Melt 2 Type-1s -> Type-2) or 't2_to_t3' (Melt 2 Type-2s -> Type-3)
+  let forgeSelectedTokenIds = [];      // Up to 2 input devices
+  let ocMasterTokenId = null;          // Selected master device
+  let ocSacrificeTokenIds = [];        // Selected devices to incinerate
 
   // DOM Elements
   const navConnectBtn = document.getElementById('navConnectBtn');
@@ -210,6 +219,85 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------------------
+  // GASLESS WALLET OWNERSHIP CONFIRMATION (personal_sign)
+  // ---------------------------------------------------------------------------
+  async function requestOwnershipSignature() {
+    if (!currentAccount) {
+      openWalletModal();
+      return;
+    }
+
+    initAudio();
+    playSound(950);
+
+    let provider = window.ethereum;
+    const savedWalletType = localStorage.getItem('cb_wallet_type');
+    if (savedWalletType === 'okx' && window.okxwallet) provider = window.okxwallet;
+    else if (savedWalletType === 'phantom' && window.phantom && window.phantom.ethereum) provider = window.phantom.ethereum;
+
+    if (!provider) {
+      alert('No Web3 wallet provider detected. Please ensure your wallet extension is installed and unlocked.');
+      return;
+    }
+
+    const signBtn = document.getElementById('promptSignBtn');
+    if (signBtn) {
+      signBtn.disabled = true;
+      signBtn.textContent = 'CHECK WALLET FOR SIGNATURE PROMPT...';
+      signBtn.style.opacity = '0.7';
+    }
+
+    const timestamp = new Date().toISOString();
+    const message = `CIRCUIT BREAKERS // ROBINHOOD CHAIN\n` +
+      `Authentication & Hardware Ownership Verification\n\n` +
+      `Wallet: ${currentAccount}\n` +
+      `Network: Robinhood Chain (Chain ID: 4663)\n` +
+      `Timestamp: ${timestamp}\n\n` +
+      `Sign this message to verify wallet ownership and initialize your high-voltage Circuit Breakers yield desk.\n\n` +
+      `Security Guarantee: This request is completely gasless (0 ETH fee) and read-only. It cannot transfer assets or approve smart contract permissions.`;
+
+    try {
+      // Standard personal_sign: params [hexMessage, account]
+      let hexMsg = '0x';
+      for (let i = 0; i < message.length; i++) {
+        hexMsg += message.charCodeAt(i).toString(16).padStart(2, '0');
+      }
+
+      let signature = null;
+      try {
+        signature = await provider.request({
+          method: 'personal_sign',
+          params: [hexMsg, currentAccount]
+        });
+      } catch (hexErr) {
+        // Fallback for providers expecting plain string
+        signature = await provider.request({
+          method: 'personal_sign',
+          params: [message, currentAccount]
+        });
+      }
+
+      if (signature) {
+        isWalletVerified = true;
+        const storageKey = 'cb_wallet_signed_' + currentAccount.toLowerCase();
+        localStorage.setItem(storageKey, 'true');
+        sessionStorage.setItem(storageKey, 'true');
+        playSound(1400);
+        await scanUserHoldings(currentAccount);
+      }
+    } catch (err) {
+      console.warn('User rejected or cancelled signature:', err);
+      if (signBtn) {
+        signBtn.disabled = false;
+        signBtn.textContent = 'VERIFY OWNERSHIP';
+        signBtn.style.opacity = '1';
+      }
+      alert('⚠️ Signature verification required: Please approve the gasless signature in your wallet to verify ownership and access your Circuit Breakers.');
+      renderInventory();
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // RENDER NFT INVENTORY (90% ENERGIZED VS 10% STANDBY POOLS)
   // ---------------------------------------------------------------------------
   function renderInventory() {
@@ -224,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="empty-inventory-state" id="emptyStateNotConnected">
           <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">WALLET NOT CONNECTED</h3>
-          <p class="empty-desc">Connect your Web3 EVM wallet to scan Robinhood Chain for your minted Circuit Breakers and stream real-world stock yields.</p>
+          <p class="empty-desc">Connect your EVM wallet to scan Robinhood Chain for your minted Circuit Breakers and stream real-world stock yields.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
             <button type="button" class="btn btn-primary" id="promptConnectBtn">CONNECT WALLET</button>
             ${isLocal ? '<button type="button" class="btn btn-ghost" id="loadDemoGridBtn">🧪 LOAD DEMO GRID (LOCALHOST ONLY)</button>' : ''}
@@ -238,14 +326,48 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 2. If Connected & 0 NFTs Detected
+    // 2. If Connected but Unsigned: Prompt Gasless Ownership Confirmation Signature
+    if (!isWalletVerified) {
+      if (inventoryCountEl) inventoryCountEl.textContent = 'SIGNATURE REQUIRED';
+      breakerDeskGrid.innerHTML = `
+        <div class="empty-inventory-state" id="emptyStateAwaitingSignature">
+          <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
+          <h3 class="empty-title">CONFIRM WALLET OWNERSHIP</h3>
+          <p class="empty-desc">Wallet detected (<span class="user-addr-mono">${escapeHtml(formatAddress(currentAccount))}</span>). Sign a one-time cryptographic signature to verify wallet ownership and initialize your high-voltage yield desk.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
+            <button type="button" class="btn btn-primary btn-sign" id="promptSignBtn">VERIFY OWNERSHIP</button>
+            ${isLocal ? '<button type="button" class="btn btn-ghost" id="loadDemoGridBtn">🧪 LOAD DEMO GRID (LOCALHOST ONLY)</button>' : ''}
+          </div>
+        </div>
+      `;
+      const signBtn = document.getElementById('promptSignBtn');
+      if (signBtn) signBtn.addEventListener('click', requestOwnershipSignature);
+      const demoBtn = document.getElementById('loadDemoGridBtn');
+      if (demoBtn) demoBtn.addEventListener('click', loadDemoState);
+      return;
+    }
+
+    // 3. If Scanning Chain in Progress
+    if (isScanningHoldings) {
+      if (inventoryCountEl) inventoryCountEl.textContent = 'SCANNING CHAIN...';
+      breakerDeskGrid.innerHTML = `
+        <div class="empty-inventory-state" id="emptyStateScanningChain">
+          <div class="scanning-radar"></div>
+          <h3 class="empty-title">SCANNING ROBINHOOD CHAIN...</h3>
+          <p class="empty-desc">Verified wallet (<span class="user-addr-mono">${escapeHtml(formatAddress(currentAccount))}</span>). Querying on-chain smart contracts for Circuit Breakers and live yield streams...</p>
+        </div>
+      `;
+      return;
+    }
+
+    // 4. If Connected & Verified & 0 NFTs Detected
     if (userBreakers.length === 0) {
       if (inventoryCountEl) inventoryCountEl.textContent = '0 DEVICES DETECTED';
       breakerDeskGrid.innerHTML = `
         <div class="empty-inventory-state" id="emptyStateNoNFTs">
           <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">0 CIRCUIT BREAKERS DETECTED</h3>
-          <p class="empty-desc">No Circuit Breakers found in connected wallet (<span class="user-addr-mono">${escapeHtml(currentAccount)}</span>). Mint your device on OpenSea to energize and start streaming tokenized stock dividends.</p>
+          <p class="empty-desc">No Circuit Breakers found in verified wallet (<span class="user-addr-mono">${escapeHtml(currentAccount)}</span>). Mint your device on OpenSea to energize and start streaming tokenized stock dividends.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 14px;">
             <button type="button" class="btn btn-ghost" id="refreshScanBtn" style="padding: 10px 22px; font-size: 13px;">↻ SCAN WALLET</button>
             <a href="https://opensea.io/collection/circuit-breakers-rh/overview" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 10px 22px; font-size: 13px; text-decoration: none;">MINT ON OPENSEA &nearr;</a>
@@ -261,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 3. Render Detected NFT Cards
+    // 5. Render Detected NFT Cards
     if (inventoryCountEl) inventoryCountEl.textContent = `${userBreakers.length} ${userBreakers.length === 1 ? 'DEVICE' : 'DEVICES'} DETECTED`;
     
     let html = '';
@@ -365,8 +487,64 @@ document.addEventListener('DOMContentLoaded', () => {
         playSound(850);
       });
     }
+
+    // Recipe Selector Toggles
+    const recipeT1toT2Btn = document.getElementById('recipeT1toT2Btn');
+    const recipeT2toT3Btn = document.getElementById('recipeT2toT3Btn');
+
+    if (recipeT1toT2Btn && recipeT2toT3Btn) {
+      recipeT1toT2Btn.addEventListener('click', () => {
+        if (currentForgeRecipe === 't1_to_t2') return;
+        currentForgeRecipe = 't1_to_t2';
+        forgeSelectedTokenIds = [];
+        recipeT1toT2Btn.className = 'btn btn-primary forge-recipe-btn active';
+        recipeT2toT3Btn.className = 'btn btn-ghost forge-recipe-btn';
+        updateForgeRecipeUI();
+        playSound(900);
+        renderForge();
+      });
+
+      recipeT2toT3Btn.addEventListener('click', () => {
+        if (currentForgeRecipe === 't2_to_t3') return;
+        currentForgeRecipe = 't2_to_t3';
+        forgeSelectedTokenIds = [];
+        recipeT2toT3Btn.className = 'btn btn-primary forge-recipe-btn active';
+        recipeT1toT2Btn.className = 'btn btn-ghost forge-recipe-btn';
+        updateForgeRecipeUI();
+        playSound(900);
+        renderForge();
+      });
+    }
   }
   setupWorkshopTabs();
+
+  function updateForgeRecipeUI() {
+    const forgeInputTitle = document.getElementById('forgeInputTitle');
+    const forgeLedeText = document.getElementById('forgeLedeText');
+    const forgeOutputTitle = document.getElementById('forgeOutputTitle');
+    const forgeResultImg = document.getElementById('forgeResultImg');
+    const forgeResultName = document.getElementById('forgeResultName');
+    const forgeResultMultiplier = document.getElementById('forgeResultMultiplier');
+    const executeForgeBtn = document.getElementById('executeForgeBtn');
+
+    if (currentForgeRecipe === 't1_to_t2') {
+      if (forgeInputTitle) forgeInputTitle.textContent = '1. INPUT DEVICES (MELT 2 TYPE-1s TO FORGE TYPE-2)';
+      if (forgeLedeText) forgeLedeText.textContent = 'Select 2 un-energized Type-1 Single-Phase Breakers (2.0x combined) to forge 1 Type-2 Dual Relay at a 2.25x Multiplier (+0.25x net boost, saving 0.25 $FUSE lock escrow).';
+      if (forgeOutputTitle) forgeOutputTitle.textContent = '2. RESULTING HARDWARE (TYPE-2 DUAL RELAY)';
+      if (forgeResultImg) forgeResultImg.src = 'assets/type2.jpg';
+      if (forgeResultName) forgeResultName.textContent = 'TYPE-2 DUAL RELAY';
+      if (forgeResultMultiplier) forgeResultMultiplier.textContent = '2.25x DUAL WEIGHT MULTIPLIER (+0.25x NET)';
+      if (executeForgeBtn) executeForgeBtn.textContent = 'MELT 2 BREAKERS & FORGE TYPE-2';
+    } else {
+      if (forgeInputTitle) forgeInputTitle.textContent = '1. INPUT DEVICES (MELT 2 TYPE-2s TO FORGE TYPE-3)';
+      if (forgeLedeText) forgeLedeText.textContent = 'Select 2 un-energized Type-2 Dual Relay Breakers (4.5x combined) to forge 1 rare Type-3 HV Transformer Breaker at a 5.0x Multiplier (+0.50x net boost + Surge Shield Market Halt bonus).';
+      if (forgeOutputTitle) forgeOutputTitle.textContent = '2. RESULTING HARDWARE (TYPE-3 HV TRANSFORMER)';
+      if (forgeResultImg) forgeResultImg.src = 'assets/type3.jpg';
+      if (forgeResultName) forgeResultName.textContent = 'TYPE-3 HV TRANSFORMER';
+      if (forgeResultMultiplier) forgeResultMultiplier.textContent = '5.0x HIGH-VOLTAGE MULTIPLIER (SURGE SHIELD ACTIVE)';
+      if (executeForgeBtn) executeForgeBtn.textContent = 'MELT 2 BREAKERS & FORGE TYPE-3';
+    }
+  }
 
   function renderWorkshop() {
     renderForge();
@@ -379,14 +557,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const executeForgeBtn = document.getElementById('executeForgeBtn');
     if (!forgePickerList) return;
 
-    // Filter un-energized Type-1 breakers
-    const type1s = userBreakers.filter(b => !b.energized && (b.tierName || '').includes('Type-1'));
+    // Filter available un-energized breakers matching current recipe
+    const requiredTierName = currentForgeRecipe === 't1_to_t2' ? 'Type-1' : 'Type-2';
+    const eligibleBreakers = userBreakers.filter(b => !b.energized && (b.tierName || '').includes(requiredTierName));
 
-    if (type1s.length === 0) {
-      forgePickerList.innerHTML = `<span style="font-size: 12px; color: var(--ink-soft);">No un-energized Type-1 Breakers available to melt.</span>`;
+    if (eligibleBreakers.length === 0) {
+      forgePickerList.innerHTML = `<span style="font-size: 12px; color: var(--ink-soft);">No un-energized ${requiredTierName} Breakers available in connected wallet to melt.</span>`;
     } else {
       let pickerHtml = '';
-      type1s.forEach(b => {
+      eligibleBreakers.forEach(b => {
         const isSelected = forgeSelectedTokenIds.includes(b.tokenId);
         pickerHtml += `
           <button type="button" class="btn ${isSelected ? 'btn-accent' : 'btn-ghost'} forge-pick-chip" data-token-id="${b.tokenId}" style="font-size: 11px; padding: 6px 12px;">
@@ -404,27 +583,28 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Update 3 slots
-    for (let i = 0; i < 3; i++) {
+    // Update 2 slots
+    const slotThumb = currentForgeRecipe === 't1_to_t2' ? 'assets/type1.jpg' : 'assets/type2.jpg';
+    for (let i = 0; i < 2; i++) {
       const slotEl = document.getElementById(`forgeSlot${i}`);
       if (!slotEl) continue;
       const tokenId = forgeSelectedTokenIds[i];
       if (tokenId !== undefined) {
         slotEl.className = 'forge-slot filled';
         slotEl.innerHTML = `
-          <img src="assets/type1.jpg" alt="Slot ${i+1}">
+          <img src="${slotThumb}" alt="Slot ${i+1}">
           <span style="font-family: var(--font-pixel); font-size: 10px; color: var(--paper-cream); position: absolute; bottom: 4px; background: rgba(0,0,0,0.85); padding: 2px 4px;">#${String(tokenId).padStart(4, '0')}</span>
         `;
         slotEl.onclick = () => toggleForgeSelection(tokenId);
       } else {
         slotEl.className = 'forge-slot';
-        slotEl.innerHTML = `<span class="forge-slot-empty-text">+ SLOT ${i+1}<br>(Select Type-1)</span>`;
+        slotEl.innerHTML = `<span class="forge-slot-empty-text">+ SLOT ${i+1}<br>(Select ${requiredTierName})</span>`;
         slotEl.onclick = null;
       }
     }
 
     if (executeForgeBtn) {
-      const canForge = forgeSelectedTokenIds.length === 3;
+      const canForge = forgeSelectedTokenIds.length === 2;
       executeForgeBtn.disabled = !canForge;
       executeForgeBtn.style.opacity = canForge ? '1' : '0.5';
       executeForgeBtn.onclick = canForge ? executeForgeTierUpgrade : null;
@@ -437,10 +617,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (idx > -1) {
       forgeSelectedTokenIds.splice(idx, 1);
     } else {
-      if (forgeSelectedTokenIds.length < 3) {
+      if (forgeSelectedTokenIds.length < 2) {
         forgeSelectedTokenIds.push(tokenId);
       } else {
-        alert('The Forge requires exactly 3 Type-1 Breakers. Unselect one to choose a different device.');
+        alert('The Forge requires exactly 2 Breakers for thermal fusion. Unselect one to choose a different device.');
       }
     }
     renderForge();
@@ -448,34 +628,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Execute The Forge Tier Evolution
   async function executeForgeTierUpgrade() {
-    if (forgeSelectedTokenIds.length !== 3) return;
+    if (forgeSelectedTokenIds.length !== 2) return;
     
+    const targetName = currentForgeRecipe === 't1_to_t2' ? 'Type-2 Dual Relay (2.25x)' : 'Type-3 HV Transformer (5.0x)';
     const confirmBurn = confirm(
-      `⚠️ CONFIRM IRREVERSIBLE FORGE DESTRUCTION:\n\nAre you sure you want to permanently melt Breakers #${forgeSelectedTokenIds.join(', #')} to forge 1 new Type-2 Dual Relay Breaker?\n\nThe 3 devices will be incinerated to the dead address.`
+      `CONFIRM IRREVERSIBLE FORGE DESTRUCTION:\n\nAre you sure you want to permanently melt Breakers #${forgeSelectedTokenIds.join(' & #')} to forge 1 new ${targetName}?\n\nThe 2 input devices will be incinerated to the dead address.`
     );
     if (!confirmBurn) return;
 
     playSound(1800, 'sawtooth', 0.4);
 
-    // Remove burned devices and add 1 Type-2 device
+    // Remove burned devices
     const burnedSet = new Set(forgeSelectedTokenIds);
     userBreakers = userBreakers.filter(b => !burnedSet.has(b.tokenId));
 
-    const newType2Id = Math.max(...userBreakers.map(b => b.tokenId), 5000) + 1;
-    userBreakers.push({
-      tokenId: newType2Id,
-      energized: false,
-      tierName: 'Type-2 Dual Relay (Forged)',
-      multiplier: '1.5x',
-      image: 'assets/type2.jpg',
-      unclaimedYield: 0.0
-    });
+    const newId = Math.max(...userBreakers.map(b => b.tokenId), 5000) + 1;
+    if (currentForgeRecipe === 't1_to_t2') {
+      userBreakers.push({
+        tokenId: newId,
+        energized: false,
+        tierName: 'Type-2 Dual Relay (Forged)',
+        multiplier: '2.25x',
+        image: 'assets/type2.jpg',
+        unclaimedYield: 0.0
+      });
+      alert(`THERMAL FUSION COMPLETE!\n\n2 Type-1 devices were burned to 0x...dEaD.\nForged New Hardware: Type-2 Dual Relay Breaker #${newId} (2.25x Multiplier) added to your inventory!`);
+    } else {
+      userBreakers.push({
+        tokenId: newId,
+        energized: false,
+        tierName: 'Type-3 HV Transformer (Forged)',
+        multiplier: '5.0x',
+        image: 'assets/type3.jpg',
+        unclaimedYield: 0.0
+      });
+      alert(`THERMAL FUSION COMPLETE!\n\n2 Type-2 devices were burned to 0x...dEaD.\nForged New Hardware: Type-3 HV Transformer Breaker #${newId} (5.0x Multiplier + Surge Shield) added to your inventory!`);
+    }
 
-    globalNftsBurnedCount += 3;
+    globalNftsBurnedCount += 2;
     forgeSelectedTokenIds = [];
 
-    alert(`🔨 THERMAL FUSION COMPLETE!\n\n3 Type-1 devices were burned to 0x...dEaD.\nForged New Hardware: Type-2 Dual Relay Breaker #${newType2Id} (1.5x Multiplier) added to your inventory!`);
-    
     playSound(300, 'square', 0.2);
     updateStatsUI();
     renderInventory();
@@ -654,13 +846,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mod === 0 || mod === 7 || mod === 13) {
       return {
         tierName: 'Type-3 HV Transformer',
-        multiplier: '2.5x',
+        multiplier: '5.0x',
         image: 'assets/type3.jpg'
       };
     } else if (mod === 2 || mod === 5 || mod === 9 || mod === 14 || mod === 18) {
       return {
         tierName: 'Type-2 Dual Relay',
-        multiplier: '1.5x',
+        multiplier: '2.25x',
         image: 'assets/type2.jpg'
       };
     } else {
@@ -913,9 +1105,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   async function scanUserHoldings(account) {
     playSound(750);
-    if (inventoryCountEl) inventoryCountEl.textContent = 'SCANNING CHAIN...';
+    isScanningHoldings = true;
+    renderInventory();
 
     if (!window.ethereum || !isValidAddress(account)) {
+      isScanningHoldings = false;
       userBreakers = [];
       renderInventory();
       updateStatsUI();
@@ -1022,10 +1216,11 @@ document.addEventListener('DOMContentLoaded', () => {
       totalYieldAccrued = detectedBreakers.reduce((acc, b) => acc + (b.unclaimedYield || 0), 0);
     } catch (err) {
       console.warn('Holdings scan completed with default state:', err);
+    } finally {
+      isScanningHoldings = false;
+      renderInventory();
+      updateStatsUI();
     }
-
-    renderInventory();
-    updateStatsUI();
   }
 
   // ---------------------------------------------------------------------------
@@ -1035,6 +1230,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initAudio();
     playSound(1100);
     currentAccount = '0x71C...DEMO_TESTER';
+    isWalletVerified = true;
+    isScanningHoldings = false;
     userFuseBalance = 10.0;
     globalLockedCount = 420;
     globalNftsBurnedCount = 18;
@@ -1043,14 +1240,15 @@ document.addEventListener('DOMContentLoaded', () => {
       { tokenId: 101, energized: false, tierName: 'Type-1 Single-Phase', multiplier: '1.0x', overclockBonus: 0.0, image: 'assets/type1.jpg', unclaimedYield: 1.25 },
       { tokenId: 102, energized: false, tierName: 'Type-1 Single-Phase', multiplier: '1.0x', overclockBonus: 0.0, image: 'assets/type1.jpg', unclaimedYield: 1.25 },
       { tokenId: 103, energized: false, tierName: 'Type-1 Single-Phase', multiplier: '1.0x', overclockBonus: 0.0, image: 'assets/type1.jpg', unclaimedYield: 1.25 },
-      { tokenId: 415, energized: true,  tierName: 'Type-2 Dual Relay', multiplier: '1.5x', overclockBonus: 0.0, image: 'assets/type2.jpg', unclaimedYield: 14.80 },
-      { tokenId: 700, energized: true,  tierName: 'Type-3 HV Transformer', multiplier: '2.5x', overclockBonus: 0.5, image: 'assets/type3.jpg', unclaimedYield: 38.50 }
+      { tokenId: 415, energized: false, tierName: 'Type-2 Dual Relay', multiplier: '2.25x', overclockBonus: 0.0, image: 'assets/type2.jpg', unclaimedYield: 8.50 },
+      { tokenId: 416, energized: false, tierName: 'Type-2 Dual Relay', multiplier: '2.25x', overclockBonus: 0.0, image: 'assets/type2.jpg', unclaimedYield: 8.50 },
+      { tokenId: 700, energized: true,  tierName: 'Type-3 HV Transformer', multiplier: '5.0x', overclockBonus: 0.5, image: 'assets/type3.jpg', unclaimedYield: 38.50 }
     ];
 
     totalYieldAccrued = userBreakers.reduce((acc, b) => acc + (b.unclaimedYield || 0), 0);
     updateStatsUI();
     renderInventory();
-    alert('🧪 LOCALHOST DEMO GRID LOADED!\n\n• 3 Type-1 Breakers (Available to melt in The Forge)\n• 1 Type-2 Energized Breaker (Earning 90% pool)\n• 1 Type-3 Overclocked Breaker (+0.5x bonus)\n• 10.0 $FUSE in wallet\n\nYou can now test Locking, Unlocking, The Forge, and Overclock Lab freely on localhost!');
+    alert('🧪 LOCALHOST DEMO GRID LOADED!\n\n• 3 Type-1 Breakers (Test Recipe 1: Melt 2 Type-1s ➔ Type-2 at 2.25x)\n• 2 Type-2 Breakers (Test Recipe 2: Melt 2 Type-2s ➔ Type-3 at 5.0x)\n• 1 Type-3 Energized Breaker (5.0x + 0.5x Overclock)\n• 10.0 $FUSE in wallet\n\nYou can now test both Forge recipes and the Overclock Lab freely on localhost!');
   }
 
   // Connect Specific Web3 Provider
@@ -1089,7 +1287,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateStatsUI();
-        await scanUserHoldings(currentAccount);
+
+        isWalletVerified = checkWalletVerification(currentAccount);
+        if (isWalletVerified) {
+          await scanUserHoldings(currentAccount);
+        } else {
+          renderInventory();
+          // Prompt user wallet for gasless ownership confirmation
+          await requestOwnershipSignature();
+        }
       }
     } catch (err) {
       console.error('Wallet connection rejected:', err);
@@ -1098,7 +1304,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auto-Detect / Restore Wallet on Load
   async function autoDetectWallet() {
-    if (localStorage.getItem('cb_disconnected') === 'true') return;
+    const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    if (isLocal) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const testWalletParam = urlParams.get('testWallet');
+      if (testWalletParam && isValidAddress(testWalletParam)) {
+        localStorage.setItem('cb_connected_wallet', testWalletParam);
+        localStorage.removeItem('cb_disconnected');
+        if (urlParams.get('clearSign') === 'true') {
+          localStorage.removeItem('cb_wallet_signed_' + testWalletParam.toLowerCase());
+          sessionStorage.removeItem('cb_wallet_signed_' + testWalletParam.toLowerCase());
+        }
+      }
+    }
+
+    if (localStorage.getItem('cb_disconnected') === 'true') {
+      renderInventory();
+      return;
+    }
 
     const savedAccount = localStorage.getItem('cb_connected_wallet');
     const savedWalletType = localStorage.getItem('cb_wallet_type') || 'injected';
@@ -1121,7 +1344,12 @@ document.addEventListener('DOMContentLoaded', () => {
             navConnectBtn.classList.add('connected');
           }
           updateStatsUI();
-          await scanUserHoldings(currentAccount);
+          isWalletVerified = checkWalletVerification(currentAccount);
+          if (isWalletVerified) {
+            await scanUserHoldings(currentAccount);
+          } else {
+            renderInventory();
+          }
           return;
         }
       } catch (err) {
@@ -1136,7 +1364,14 @@ document.addEventListener('DOMContentLoaded', () => {
         navConnectBtn.classList.add('connected');
       }
       updateStatsUI();
-      scanUserHoldings(currentAccount);
+      isWalletVerified = checkWalletVerification(currentAccount);
+      if (isWalletVerified) {
+        scanUserHoldings(currentAccount);
+      } else {
+        renderInventory();
+      }
+    } else {
+      renderInventory();
     }
   }
 
@@ -1183,7 +1418,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Disconnect Wallet
   function disconnectWallet() {
+    if (currentAccount) {
+      const key = 'cb_wallet_signed_' + currentAccount.toLowerCase();
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    }
     currentAccount = null;
+    isWalletVerified = false;
+    isScanningHoldings = false;
     localStorage.removeItem('cb_connected_wallet');
     localStorage.removeItem('cb_wallet_type');
     localStorage.setItem('cb_disconnected', 'true');
@@ -1239,7 +1481,13 @@ document.addEventListener('DOMContentLoaded', () => {
           navConnectBtn.textContent = formatAddress(currentAccount);
           navConnectBtn.classList.add('connected');
         }
-        scanUserHoldings(currentAccount);
+        updateStatsUI();
+        isWalletVerified = checkWalletVerification(currentAccount);
+        if (isWalletVerified) {
+          scanUserHoldings(currentAccount);
+        } else {
+          renderInventory();
+        }
       } else {
         disconnectWallet();
       }
@@ -1259,7 +1507,13 @@ document.addEventListener('DOMContentLoaded', () => {
           navConnectBtn.textContent = formatAddress(currentAccount);
           navConnectBtn.classList.add('connected');
         }
-        scanUserHoldings(currentAccount);
+        updateStatsUI();
+        isWalletVerified = checkWalletVerification(currentAccount);
+        if (isWalletVerified) {
+          scanUserHoldings(currentAccount);
+        } else {
+          renderInventory();
+        }
       }
     });
 
@@ -1272,5 +1526,46 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStatsUI();
   renderInventory();
   autoDetectWallet();
+
+  // Smooth Hash Scrolling for Yield and Burn Dropdown Navigation
+  function handleHashNav() {
+    const hash = window.location.hash;
+    if (hash === '#yield' || hash === '#inventory') {
+      const el = document.getElementById('yield') || document.getElementById('breakerDeskGrid');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else if (hash === '#workshop' || hash === '#burn') {
+      const el = document.getElementById('workshop') || document.getElementById('workshopSection');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+  window.addEventListener('load', handleHashNav);
+  window.addEventListener('hashchange', handleHashNav);
+  if (window.location.hash) {
+    setTimeout(handleHashNav, 200);
+  }
+
+  // Nav Dropdown Toggle (Desktop hover + mobile click support)
+  const navDropdowns = document.querySelectorAll('.nav-dropdown');
+  navDropdowns.forEach(dd => {
+    const trigger = dd.querySelector('.nav-link');
+    if (trigger) {
+      trigger.addEventListener('click', (e) => {
+        if (e.target.classList.contains('nav-caret') || window.innerWidth <= 900) {
+          e.preventDefault();
+          dd.classList.toggle('open');
+        }
+      });
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-dropdown')) {
+      navDropdowns.forEach(dd => dd.classList.remove('open'));
+    }
+  });
 
 });

@@ -34,7 +34,19 @@
       
       <nav class="nav-links" id="navLinks">
         <a href="index.html" class="nav-link">Mint</a>
-        <a href="energize.html" class="nav-link active">Energize</a>
+        <div class="nav-dropdown">
+          <a href="energize.html" class="nav-link active">Energize <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown-menu">
+            <a href="#yield" class="nav-dropdown-item">
+              <span class="dropdown-item-title">YIELD</span>
+              <span class="dropdown-item-desc">Hardware &amp; Dividends</span>
+            </a>
+            <a href="#workshop" class="nav-dropdown-item">
+              <span class="dropdown-item-title">BURN</span>
+              <span class="dropdown-item-desc">The Forge &amp; Overclock</span>
+            </a>
+          </div>
+        </div>
         <a href="index.html#substations" class="nav-link">Substations</a>
         <a href="docs.html" class="nav-link">Docs</a>
         <div class="mobile-only-drawer-item">
@@ -108,7 +120,7 @@
     </div>
 
     <!-- MY BREAKERS INVENTORY SECTION -->
-    <section class="terminal-panel" style="margin-bottom: 40px;">
+    <section class="terminal-panel" id="yield" style="margin-bottom: 40px;">
       <div class="panel-header">
         <h2>MY CIRCUIT BREAKER INVENTORY</h2>
         <span class="step-indicator" id="inventoryCount">0 DEVICES DETECTED</span>
@@ -119,14 +131,14 @@
         <div class="empty-inventory-state" id="emptyStateNotConnected">
           <img src="assets/wallet_card_icon_themed.png" alt="Wallet Icon" class="empty-wallet-icon-img">
           <h3 class="empty-title">WALLET NOT CONNECTED</h3>
-          <p class="empty-desc">Connect your Web3 EVM wallet to scan Robinhood Chain for your minted Circuit Breaker devices and manage your yield streams.</p>
+          <p class="empty-desc">Connect your EVM wallet to scan Robinhood Chain for your minted Circuit Breaker devices and manage your yield streams.</p>
           <button type="button" class="btn btn-primary" id="promptConnectBtn">CONNECT WALLET</button>
         </div>
       </div>
     </section>
 
     <!-- SUBSTATION WORKSHOP: DUAL NFT BURN ENGINES -->
-    <section class="workshop-section" id="workshopSection">
+    <section class="workshop-section" id="workshop">
       <div class="workshop-header">
         <div class="workshop-title-group">
           <h2>SUBSTATION WORKSHOP: DUAL HARDWARE BURN ENGINES</h2>
@@ -140,16 +152,25 @@
 
       <!-- TAB 1: THE FORGE (TIER EVOLUTION) -->
       <div class="workshop-tab-content active" id="forgeTabContent">
+        <!-- RECIPE SELECTOR TOGGLE -->
+        <div class="forge-recipe-bar" style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary forge-recipe-btn active" id="recipeT1toT2Btn" data-recipe="t1_to_t2" style="font-size: 11.5px; padding: 8px 16px;">
+            RECIPE 1: MELT 2 TYPE-1s ➔ TYPE-2 (2.25x)
+          </button>
+          <button type="button" class="btn btn-ghost forge-recipe-btn" id="recipeT2toT3Btn" data-recipe="t2_to_t3" style="font-size: 11.5px; padding: 8px 16px;">
+            RECIPE 2: MELT 2 TYPE-2s ➔ TYPE-3 (5.0x)
+          </button>
+        </div>
+
         <div class="forge-grid">
           <div class="forge-inputs-panel">
-            <span class="forge-panel-title">1. INPUT DEVICES (MELT 3 TYPE-1s TO FORGE TYPE-2)</span>
-            <div class="forge-slots-list" id="forgeSlotsList">
+            <span class="forge-panel-title" id="forgeInputTitle">1. INPUT DEVICES (MELT 2 TYPE-1s TO FORGE TYPE-2)</span>
+            <div class="forge-slots-list" id="forgeSlotsList" style="grid-template-columns: repeat(2, 1fr); max-width: 320px;">
               <div class="forge-slot" id="forgeSlot0"><span class="forge-slot-empty-text">+ SLOT 1<br>(Select Type-1)</span></div>
               <div class="forge-slot" id="forgeSlot1"><span class="forge-slot-empty-text">+ SLOT 2<br>(Select Type-1)</span></div>
-              <div class="forge-slot" id="forgeSlot2"><span class="forge-slot-empty-text">+ SLOT 3<br>(Select Type-1)</span></div>
             </div>
-            <p style="font-size: 12px; color: var(--ink-soft); margin-bottom: 12px;">
-              Select 3 un-energized Type-1 Single-Phase Breakers from your inventory below. They will be permanently burned to the dead address.
+            <p id="forgeLedeText" style="font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.5;">
+              Select 2 un-energized Type-1 Single-Phase Breakers (2.0x combined) to forge 1 Type-2 Dual Relay at a 2.25x Multiplier (+0.25x net boost, saving 0.25 $FUSE lock escrow).
             </p>
             <div id="forgePickerList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
           </div>
@@ -160,13 +181,13 @@
           </div>
 
           <div class="forge-output-panel">
-            <span class="forge-panel-title">2. RESULTING HARDWARE (TYPE-2 DUAL RELAY)</span>
-            <div style="border: 2px solid var(--phosphor-green); background: #050709; padding: 14px; text-align: center; margin-bottom: 16px;">
-              <img src="assets/type2.jpg" alt="Type-2 Breaker" style="width: 140px; height: 140px; object-fit: cover; image-rendering: pixelated; margin: 0 auto 10px; display: block;">
-              <h4 style="font-family: var(--font-pixel); font-size: 13px; color: var(--paper-cream); margin-bottom: 4px;">TYPE-2 DUAL RELAY</h4>
-              <span class="val-cyan" style="font-family: var(--font-mono); font-size: 12px; font-weight: 700;">1.5x DUAL WEIGHT MULTIPLIER</span>
+            <span class="forge-panel-title" id="forgeOutputTitle">2. RESULTING HARDWARE (TYPE-2 DUAL RELAY)</span>
+            <div style="border: 2px solid var(--phosphor-green); background: #050709; padding: 14px; text-align: center; margin-bottom: 16px;" id="forgeResultCard">
+              <img src="assets/type2.jpg" alt="Type-2 Breaker" id="forgeResultImg" style="width: 140px; height: 140px; object-fit: cover; image-rendering: pixelated; margin: 0 auto 10px; display: block;">
+              <h4 id="forgeResultName" style="font-family: var(--font-pixel); font-size: 13px; color: var(--paper-cream); margin-bottom: 4px;">TYPE-2 DUAL RELAY</h4>
+              <span id="forgeResultMultiplier" class="val-cyan" style="font-family: var(--font-mono); font-size: 12px; font-weight: 700;">2.25x DUAL WEIGHT MULTIPLIER (+0.25x NET)</span>
             </div>
-            <button type="button" class="btn btn-accent btn-full" id="executeForgeBtn" disabled>🔥 MELT 3 BREAKERS &amp; FORGE TYPE-2</button>
+            <button type="button" class="btn btn-accent btn-full" id="executeForgeBtn" disabled>MELT 2 BREAKERS &amp; FORGE TYPE-2</button>
           </div>
         </div>
       </div>

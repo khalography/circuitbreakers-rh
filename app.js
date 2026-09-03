@@ -393,4 +393,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Auto-Detect
   autoDetectNavWallet();
 
+  // Nav Dropdown Toggle (Desktop hover + mobile click support)
+  const navDropdowns = document.querySelectorAll('.nav-dropdown');
+  navDropdowns.forEach(dd => {
+    const trigger = dd.querySelector('.nav-link');
+    if (trigger) {
+      trigger.addEventListener('click', (e) => {
+        if (e.target.classList.contains('nav-caret') || window.innerWidth <= 900) {
+          e.preventDefault();
+          dd.classList.toggle('open');
+        }
+      });
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-dropdown')) {
+      navDropdowns.forEach(dd => dd.classList.remove('open'));
+    }
+  });
+
 });
