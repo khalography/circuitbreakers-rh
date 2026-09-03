@@ -17,13 +17,13 @@
   <!-- TOP STATUS MARQUEE -->
   <div class="ticker-bar">
     <div class="ticker-content">
-      <span>⚡ SUBSTATION STATUS: ONLINE</span>
-      <span>• 2.0% DEX SWAP TAX STREAMING TO ENERGIZED BREAKERS</span>
+      <span>SUBSTATION STATUS: ONLINE</span>
+      <span>• 2.30% DEX SWAP TAX STREAMING TO YIELD VAULT</span>
       <span>• $NVDA DIVIDEND: +4.8%</span>
       <span>• $HOOD DIVIDEND: +12.3%</span>
       <span>• $TSLA DIVIDEND: +3.1%</span>
-      <span>• US T-BILLS YIELD: +5.25% APY</span>
-      <span>• BURN RATE: 1.0 $FUSE PER ENERGIZATION</span>
+      <span>• $USDG STABLE YIELD: ACTIVE</span>
+      <span>• LOCK REQUIREMENT: 0.25 $FUSE (REFUNDABLE ESCROW)</span>
     </div>
   </div>
 
@@ -66,20 +66,24 @@
     <!-- PAGE HERO HEADER -->
     <section class="dapp-hero">
       <div class="dapp-hero-left">
-        <span class="eyebrow" style="color: var(--phosphor-green); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; font-weight: 700;">SUBSTATION PROTOCOL // YIELD DESK</span>
-        <h1 class="hero-title" style="margin-top: 6px;">BURN &amp; ENERGIZE TERMINAL</h1>
+        <span class="eyebrow" style="color: var(--phosphor-green); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; font-weight: 700;">SUBSTATION PROTOCOL // YIELD &amp; WORKSHOP DESK</span>
+        <h1 class="hero-title" style="margin-top: 6px;">ENERGIZE &amp; WORKSHOP TERMINAL</h1>
         <p class="hero-lede" style="max-width: 680px;">
-          Close the electrical circuit on your mechanical Breaker devices. Burning 1.0 $FUSE permanently locks your breaker into the high-voltage yield grid to stream real-world stock dividends on Robinhood Chain.
+          Manage your mechanical Breakers on Robinhood Chain. Lock 0.25 $FUSE in escrow to connect your device to the <strong>90% High-Voltage Yield Grid</strong> streaming tokenized stocks ($NVDA, $HOOD, $TSLA) and USDG. Even if 100% of devices are energized, a maximum of 25% of the $FUSE supply is ever locked (preserving 75%+ float for DEX liquidity). Un-energized devices earn from the <strong>10% Standby Pool</strong>.
         </p>
       </div>
       <div class="dapp-hero-stats">
         <div class="dapp-stat-box">
-          <span class="d-stat-label">TOTAL BURNED $FUSE</span>
-          <span class="d-stat-val val-cyan" id="globalBurned">0 / 3,333</span>
+          <span class="d-stat-label">TOTAL LOCKED $FUSE</span>
+          <span class="d-stat-val val-cyan" id="globalLocked">0 / 833.25</span>
         </div>
         <div class="dapp-stat-box">
-          <span class="d-stat-label">GRID ENERGIZED RATE</span>
-          <span class="d-stat-val val-amber" id="globalRate">0.0% OF FLOAT</span>
+          <span class="d-stat-label">90% HIGH-VOLTAGE GRID</span>
+          <span class="d-stat-val val-amber" id="globalRate">0 ENERGIZED</span>
+        </div>
+        <div class="dapp-stat-box">
+          <span class="d-stat-label">TOTAL NFTS BURNED</span>
+          <span class="d-stat-val val-cyan" id="globalNftsBurned">0 BURNED</span>
         </div>
       </div>
     </section>
@@ -117,6 +121,85 @@
           <h3 class="empty-title">WALLET NOT CONNECTED</h3>
           <p class="empty-desc">Connect your Web3 EVM wallet to scan Robinhood Chain for your minted Circuit Breaker devices and manage your yield streams.</p>
           <button type="button" class="btn btn-primary" id="promptConnectBtn">CONNECT WALLET</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBSTATION WORKSHOP: DUAL NFT BURN ENGINES -->
+    <section class="workshop-section" id="workshopSection">
+      <div class="workshop-header">
+        <div class="workshop-title-group">
+          <h2>SUBSTATION WORKSHOP: DUAL HARDWARE BURN ENGINES</h2>
+          <p>Permanently incinerate Breakers to upgrade rarity tiers or supercharge master yield multipliers.</p>
+        </div>
+        <div class="workshop-tabs">
+          <button type="button" class="workshop-tab-btn active" id="tabForgeBtn" data-tab="forge">🔨 THE FORGE</button>
+          <button type="button" class="workshop-tab-btn" id="tabOverclockBtn" data-tab="overclock">⏱ OVERCLOCK LAB</button>
+        </div>
+      </div>
+
+      <!-- TAB 1: THE FORGE (TIER EVOLUTION) -->
+      <div class="workshop-tab-content active" id="forgeTabContent">
+        <div class="forge-grid">
+          <div class="forge-inputs-panel">
+            <span class="forge-panel-title">1. INPUT DEVICES (MELT 3 TYPE-1s TO FORGE TYPE-2)</span>
+            <div class="forge-slots-list" id="forgeSlotsList">
+              <div class="forge-slot" id="forgeSlot0"><span class="forge-slot-empty-text">+ SLOT 1<br>(Select Type-1)</span></div>
+              <div class="forge-slot" id="forgeSlot1"><span class="forge-slot-empty-text">+ SLOT 2<br>(Select Type-1)</span></div>
+              <div class="forge-slot" id="forgeSlot2"><span class="forge-slot-empty-text">+ SLOT 3<br>(Select Type-1)</span></div>
+            </div>
+            <p style="font-size: 12px; color: var(--ink-soft); margin-bottom: 12px;">
+              Select 3 un-energized Type-1 Single-Phase Breakers from your inventory below. They will be permanently burned to the dead address.
+            </p>
+            <div id="forgePickerList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+          </div>
+
+          <div class="forge-arrow-wrap">
+            <span class="forge-arrow-icon">➔</span>
+            <span>THERMAL FUSION</span>
+          </div>
+
+          <div class="forge-output-panel">
+            <span class="forge-panel-title">2. RESULTING HARDWARE (TYPE-2 DUAL RELAY)</span>
+            <div style="border: 2px solid var(--phosphor-green); background: #050709; padding: 14px; text-align: center; margin-bottom: 16px;">
+              <img src="assets/type2.jpg" alt="Type-2 Breaker" style="width: 140px; height: 140px; object-fit: cover; image-rendering: pixelated; margin: 0 auto 10px; display: block;">
+              <h4 style="font-family: var(--font-pixel); font-size: 13px; color: var(--paper-cream); margin-bottom: 4px;">TYPE-2 DUAL RELAY</h4>
+              <span class="val-cyan" style="font-family: var(--font-mono); font-size: 12px; font-weight: 700;">1.5x DUAL WEIGHT MULTIPLIER</span>
+            </div>
+            <button type="button" class="btn btn-accent btn-full" id="executeForgeBtn" disabled>🔥 MELT 3 BREAKERS &amp; FORGE TYPE-2</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: OVERCLOCK LAB (MULTIPLIER BOOST) -->
+      <div class="workshop-tab-content" id="overclockTabContent">
+        <div class="overclock-grid">
+          <div class="oc-master-card">
+            <span class="forge-panel-title">PRIMARY MASTER DEVICE</span>
+            <div id="ocMasterPreview" style="border: 1px solid #222; background: #050709; padding: 12px; text-align: center; margin-bottom: 14px;">
+              <p style="font-size: 12px; color: var(--ink-soft);">Select a Master Breaker to receive the permanent multiplier overclock.</p>
+            </div>
+            <div class="oc-impact-summary">
+              <span style="font-size: 11px; color: var(--ink-soft); font-family: var(--font-mono);">NEW MULTIPLIER:</span>
+              <span class="oc-boost-preview" id="ocTotalBoostDisplay">--</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-full" id="executeOverclockBtn" disabled>SACRIFICE &amp; OVERCLOCK</button>
+          </div>
+
+          <div class="oc-sacrifice-pool">
+            <div class="oc-pool-header">
+              <span class="forge-panel-title" style="margin: 0;">SACRIFICE INVENTORY (SELECT TO BURN)</span>
+              <span style="font-size: 11px; font-family: var(--font-mono); color: #FF5555;" id="ocBurnCountLabel">0 SELECTED FOR DESTRUCTION</span>
+            </div>
+            <p style="font-size: 12px; color: var(--ink-soft); margin-bottom: 12px;">
+              Select auxiliary un-energized Breakers to incinerate. Type-1 adds <strong>+0.25x</strong>, Type-2 adds <strong>+0.50x</strong> permanently to your Master Breaker.
+            </p>
+            <div class="oc-items-scroll" id="ocSacrificeList">
+              <div style="grid-column: 1/-1; text-align: center; padding: 30px 10px; color: var(--ink-soft); font-size: 12px;">
+                Connect wallet to load available devices.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

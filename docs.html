@@ -17,11 +17,11 @@
   <!-- TOP STATUS MARQUEE -->
   <div class="ticker-bar">
     <div class="ticker-content">
-      <span>⚡ PROTOCOL DOCUMENTATION // ROBINHOOD CHAIN L2</span>
+      <span>PROTOCOL DOCUMENTATION // ROBINHOOD CHAIN L2</span>
       <span>• CONTRACT STANDARD: ERC-721 + ERC-20 FEE HOOK</span>
       <span>• SUPPLY INVARIANT: 3,333 HARD CAP</span>
-      <span>• PERMANENT PROTOCOL TAX: 3.00%</span>
-      <span>• 0% TEAM ALLOCATION • 100% COMMUNITY FAIR LAUNCH</span>
+      <span>• PERMANENT PROTOCOL TAX: 3.00% (2.30% VAULT • 0.60% LP • 0.10% BURN)</span>
+      <span>• ALLOCATION: 3,300 PUBLIC (99%) • 33 TEAM (1%)</span>
     </div>
   </div>
 
@@ -44,7 +44,7 @@
       </nav>
       <div class="topbar-right">
         <div class="header-badges">
-          <span class="badge badge-live"><i class="dot"></i> SPECS V1.0</span>
+          <span class="badge badge-live"><i class="dot"></i> SPECS V2.0</span>
           <span class="badge badge-chain">ROBINHOOD CHAIN</span>
         </div>
         <button class="btn btn-audio" id="audioToggle" aria-label="Toggle Audio Feedback">
@@ -67,7 +67,7 @@
         <span class="eyebrow" style="color: var(--cyan-electric); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; font-weight: 700;">CIRCUIT BREAKERS PROTOCOL // WHITE PAPER</span>
         <h1 class="hero-title" style="margin-top: 6px;">TECHNICAL PROTOCOL SPECS</h1>
         <p class="hero-lede" style="max-width: 720px;">
-          The complete architectural blueprint, mathematical fee models, device rarity weight matrices, and real-world asset distribution mechanics on Robinhood Chain.
+          The complete architectural blueprint, mathematical fee models, 90/10 yield dual-accumulator, 0.25 $FUSE locking engine, and Substation Workshop NFT burn mechanics on Robinhood Chain.
         </p>
       </div>
       <div class="dapp-hero-stats">
@@ -76,8 +76,8 @@
           <span class="d-stat-val val-cyan">3.00% DEX HOOK</span>
         </div>
         <div class="dapp-stat-box">
-          <span class="d-stat-label">YIELD SHARE</span>
-          <span class="d-stat-val val-amber">66.6% TO BREAKERS</span>
+          <span class="d-stat-label">YIELD VAULT</span>
+          <span class="d-stat-val val-amber">2.30% (76.7% OF TAX)</span>
         </div>
       </div>
     </section>
@@ -96,8 +96,9 @@
             <a href="#doc-tiers" class="side-link">4. Device Models &amp; Weights</a>
             <a href="#doc-fees" class="side-link">5. The 3% Fee Engine</a>
             <a href="#doc-substations" class="side-link">6. RWA Substations</a>
-            <a href="#doc-halts" class="side-link">7. Market Halt Events</a>
-            <a href="#doc-faq" class="side-link">8. FAQ &amp; Verification</a>
+            <a href="#doc-workshop" class="side-link">7. Substation Workshop (Burns)</a>
+            <a href="#doc-halts" class="side-link">8. Market Halt Events</a>
+            <a href="#doc-faq" class="side-link">9. FAQ &amp; Verification</a>
           </nav>
         </div>
       </aside>
@@ -112,7 +113,7 @@
             <span class="panel-num">#01</span>
           </div>
           <p>
-            <strong>$FUSE has a strict hard cap of 3,333 units and never any more.</strong> Holding one whole liquid token automatically draws a volatile, unlit <em>Tripped Breaker</em> to your wallet from the unclaimed pool. Burn the token behind a device you own and the breaker is <strong>Energized</strong> — the copper knife switch snaps shut <code>[ON]</code>, its vacuum filaments ignite, and it permanently leaves the tradable float to earn continuous tokenized stock dividends from every DEX swap on Robinhood Chain. Every trade pays a permanent <strong>3.0% protocol fee</strong>: two thirds stream directly to Energized Breakers as RWA equity dividends, 20% compounds locked liquidity forever, and 14% buys back and burns $FUSE.
+            <strong>Circuit Breakers</strong> is a mechanical 16-bit industrial hardware collection of 3,333 devices on <strong>Robinhood Chain</strong> that stream real-world tokenized stock dividends ($NVDA, $HOOD, $TSLA) and USDG directly into holders' wallets. All minted devices start in <strong>Standby</strong> earning a baseline share of the <strong>10% Standby Pool</strong>. To access the <strong>90% High-Voltage Yield Grid</strong>, holders lock <strong>0.25 $FUSE</strong> in Vault escrow (refundable at any time). Capping the lock cost at 0.25 $FUSE mathematically guarantees that even if 100% of all 3,333 Breakers are energized simultaneously, a maximum of 25.0% of the 3,333 $FUSE supply is ever locked (833.25 tokens), guaranteeing that <strong>at least 75.0% (2,499.75 $FUSE) remains permanently floating for active DEX trading and liquidity</strong>. Every DEX swap captures a permanent 3.0% fee: <strong>2.30% to the Yield Vault</strong>, <strong>0.60% permanently locked liquidity</strong>, and <strong>0.10% (0.001) burned</strong>. Furthermore, holders can permanently incinerate duplicate devices in the <strong>Substation Workshop</strong> via <em>The Forge</em> (melt 3 Type-1s to forge a Type-2) or the <em>Overclock Lab</em> (sacrifice auxiliary devices for permanent multiplier boosts).
           </p>
         </article>
 
@@ -125,23 +126,23 @@
           <dl class="doc-glossary">
             <div class="glossary-item">
               <dt>Device / Circuit Breaker</dt>
-              <dd>One of the 3,333 mechanical electrical circuit breakers rendered in authentic 16-bit industrial pixel art.</dd>
+              <dd>One of the 3,333 mechanical electrical circuit breakers rendered in authentic 16-bit industrial pixel art on Robinhood Chain.</dd>
             </div>
             <div class="glossary-item">
-              <dt>Tripped (Volatile State)</dt>
-              <dd>Backed by 1.0 liquid $FUSE. Knife switch is open, meters are dark, trades freely on DEXs, earns no yield. Dissolves back to pool if token balance drops below 1.0.</dd>
+              <dt>Standby State (10% Pool)</dt>
+              <dd>Default state when holding an un-energized Breaker. The knife switch is open, meters idle, earning a continuous baseline stream from the 10% Standby Pool.</dd>
             </div>
             <div class="glossary-item">
-              <dt>Energized (Permanent State)</dt>
-              <dd>The backing 1.0 $FUSE token has been permanently burned. The knife switch snaps shut, vacuum filaments glow, and it begins streaming stock dividends continuously.</dd>
+              <dt>Energized State (90% Pool)</dt>
+              <dd>0.25 $FUSE token is locked in Vault escrow (refundable). The knife switch snaps shut, vacuum filaments glow, and the device streams from the 90% High-Voltage Yield Grid.</dd>
             </div>
             <div class="glossary-item">
-              <dt>Substation</dt>
-              <dd>The yield destination (Equities or US Treasury) streaming real-world asset dividends to Energized Breakers.</dd>
+              <dt>The Forge (Tier Evolution)</dt>
+              <dd>Permanently melt 3 Type-1 Single-Phase Breakers to forge 1 rare Type-2 Dual Relay Breaker (1.5&times; multiplier), incinerating the 3 input devices to the dead address.</dd>
             </div>
             <div class="glossary-item">
-              <dt>Market Halt Event</dt>
-              <dd>An automated 15-minute protocol state triggered during volatility spikes that doubles (2&times;) fee distributions.</dd>
+              <dt>Overclock Lab (Component Sacrifice)</dt>
+              <dd>Sacrifice secondary Breakers into a primary Master Breaker to permanently increase its yield multiplier (+0.25&times; per Type-1, +0.50&times; per Type-2).</dd>
             </div>
           </dl>
         </article>
@@ -149,34 +150,34 @@
         <!-- 3. How It Works -->
         <article class="doc-panel" id="doc-how">
           <div class="doc-panel-head">
-            <h3>3. How It Works (The 5 Steps)</h3>
+            <h3>3. How It Works (The Core Flywheel)</h3>
             <span class="panel-num">#03</span>
           </div>
           <div class="doc-steps-grid">
             <div class="step-box">
               <span class="step-num">01</span>
-              <h4>Hold 1.0 $FUSE</h4>
-              <p>Cross the whole-unit token threshold and a random unlit Tripped Breaker materializes in your wallet.</p>
+              <h4>Acquire Breakers &amp; $FUSE</h4>
+              <p>Mint or acquire Circuit Breakers on OpenSea and hold $FUSE tokens on Robinhood Chain.</p>
             </div>
             <div class="step-box">
               <span class="step-num">02</span>
-              <h4>Reroll If Desired</h4>
-              <p>Selling below 1.0 dissolves your device back to the pool. Buying back draws a new random unit.</p>
+              <h4>Lock 0.25 $FUSE</h4>
+              <p>Lock 0.25 $FUSE in Vault escrow to route your device to the 90% High-Voltage Grid. Even if all 3,333 devices are energized, a maximum of 25% of the total $FUSE supply can ever be locked (preserving 75%+ float for DEX liquidity). Tokens can be unlocked at any time.</p>
             </div>
             <div class="step-box">
               <span class="step-num">03</span>
-              <h4>Burn to Energize</h4>
-              <p>Call <code>burnAndEnergize()</code> to burn the backing token. The device becomes permanent and immutable.</p>
+              <h4>90/10 Dual Dividends</h4>
+              <p>90% of tokenized stock &amp; USDG dividends route to Energized devices; 10% routes to Standby devices.</p>
             </div>
             <div class="step-box">
               <span class="step-num">04</span>
-              <h4>Dividends Stream</h4>
-              <p>Every trade on the DEX pays the 3.0% fee, streaming real-world stock fractions directly to your device.</p>
+              <h4>DEX Volume Burn</h4>
+              <p>Every DEX swap fee captures 2.30% for the Yield Vault, 0.60% for LP, and burns 0.10% (0.001) permanently.</p>
             </div>
             <div class="step-box">
               <span class="step-num">05</span>
-              <h4>Float Deflation</h4>
-              <p>Every Energization permanently reduces the liquid $FUSE float while boosting yield for locked earners.</p>
+              <h4>Workshop NFT Burns</h4>
+              <p>Burn secondary devices in The Forge or Overclock Lab to evolve tiers and permanently boost multipliers.</p>
             </div>
           </div>
         </article>
@@ -203,31 +204,19 @@
                   <td><strong>Type-1: Single-Phase Bakelite</strong></td>
                   <td>2,000 (60.0%)</td>
                   <td><span class="tag-weight">1.0&times;</span></td>
-                  <td>Standard Substation Yield Stream</td>
+                  <td>Baseline Substation Yield (Meltable in The Forge)</td>
                 </tr>
                 <tr>
                   <td><strong>Type-2: Dual-Circuit Relay</strong></td>
                   <td>833 (25.0%)</td>
                   <td><span class="tag-weight">1.5&times;</span></td>
-                  <td>Dual Desk Affinity (Splits across 2 Baskets)</td>
+                  <td>+50% Higher Dividend Allocation (+0.50x Overclock Value)</td>
                 </tr>
                 <tr>
                   <td><strong>Type-3: HV Transformer Breaker</strong></td>
-                  <td>333 (10.0%)</td>
+                  <td>500 (15.0%)</td>
                   <td><span class="tag-weight">2.5&times;</span></td>
-                  <td>Surge Shield (+50% Market Halt Payout Bonus)</td>
-                </tr>
-                <tr>
-                  <td><strong>Type-4: Tri-Phase Master Console</strong></td>
-                  <td>160 (4.8%)</td>
-                  <td><span class="tag-weight">5.0&times;</span></td>
-                  <td>Grid Interconnect (Earns Across ALL Desks)</td>
-                </tr>
-                <tr>
-                  <td><strong>Type-5: Edison Patent Prototype</strong></td>
-                  <td>7 (0.2%)</td>
-                  <td><span class="tag-weight">10.0&times;</span></td>
-                  <td>Master Grid Skim (Direct Overall DEX Tax Cut)</td>
+                  <td>Surge Shield (+50% Market Halt Volatility Bonus)</td>
                 </tr>
               </tbody>
             </table>
@@ -240,7 +229,7 @@
             <h3>5. The 3.0% Fee Engine</h3>
             <span class="panel-num">#05</span>
           </div>
-          <p class="panel-desc">The permanent protocol fee is locked at <strong>3.0% of trading volume</strong>, enforced immutably by the Uniswap v4 / Robinhood Chain pool hook. Wallet-to-wallet transfers are tax-free:</p>
+          <p class="panel-desc">The protocol fee is set at <strong>3.0% on DEX swaps</strong>, automatically captured on Robinhood Chain AMMs. Wallet-to-wallet transfers and Vault locking are 100% tax-free:</p>
           <div class="doc-table-wrap">
             <table class="doc-table">
               <thead>
@@ -253,10 +242,10 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Energized Breakers (RWA Yield)</strong></td>
-                  <td>66.6%</td>
-                  <td>2.00%</td>
-                  <td>Distributed continuously based on device tier weight</td>
+                  <td><strong>Yield Vault (Tokenized Stocks &amp; USDG)</strong></td>
+                  <td>76.7%</td>
+                  <td>2.30%</td>
+                  <td>Converted to $NVDA, $HOOD, &amp; USDG for 90/10 holder distribution</td>
                 </tr>
                 <tr>
                   <td><strong>Permanently Locked Liquidity</strong></td>
@@ -265,10 +254,10 @@
                   <td>Auto-compounds into immutable ownerless LP locker</td>
                 </tr>
                 <tr>
-                  <td><strong>$FUSE Buyback &amp; Burn</strong></td>
-                  <td>13.4%</td>
-                  <td>0.40%</td>
-                  <td>Automated market buyback and permanent burn</td>
+                  <td><strong>Deflationary Burn</strong></td>
+                  <td>3.3%</td>
+                  <td>0.10% (0.001)</td>
+                  <td>Permanently incinerated from circulating $FUSE supply</td>
                 </tr>
               </tbody>
             </table>
@@ -281,7 +270,7 @@
             <h3>6. RWA Yield Substations</h3>
             <span class="panel-num">#06</span>
           </div>
-          <p class="panel-desc">Yield streams automatically allocate into two primary Real-World Asset Substations on Robinhood Chain:</p>
+          <p class="panel-desc">Yield streams automatically allocate into Real-World Asset baskets on Robinhood Chain. <strong>Yields are not paid out in raw ETH</strong>; incoming fees and protocol revenue are converted directly into tokenized stocks ($NVDA, $HOOD, $TSLA) and the USDG yield-bearing stablecoin:</p>
           <div class="substation-grid-2col" style="margin-top: 10px;">
             <div class="sub-card-featured sub-card-equities">
               <div class="sub-card-top">
@@ -289,24 +278,57 @@
                 <span class="sub-badge sub-badge-cyan">DEX VOLUME DIVIDENDS</span>
               </div>
               <h3>Tokenized Equities &amp; Stock Basket</h3>
-              <p class="sub-desc">High-growth tech heavyweights ($NVDA, $AAPL, $TSLA, $MSFT), Robinhood ecosystem assets ($HOOD, $ARBK, $WETH), and volatility squeeze equities ($GME, $PLTR).</p>
+              <p class="sub-desc">High-growth tech heavyweights ($NVDA, $AAPL, $TSLA, $MSFT), Robinhood ecosystem assets ($HOOD, $ARBK), and volatility squeeze equities ($GME, $PLTR).</p>
             </div>
             <div class="sub-card-featured sub-card-treasury">
               <div class="sub-card-top">
-                <div class="sub-icon-emoji">🏦</div>
-                <span class="sub-badge sub-badge-amber">FIXED INCOME RESERVE</span>
+                <div class="sub-icon-emoji">💵</div>
+                <span class="sub-badge sub-badge-amber">STABLE YIELD RESERVE</span>
               </div>
-              <h3>US Treasury &amp; Fixed Income</h3>
-              <p class="sub-desc">Capital-preserving yield backed by tokenized short-term US Treasury Bills and USDG stable yield reserves.</p>
+              <h3>USDG Stablecoin Reserve</h3>
+              <p class="sub-desc">Capital-preserving, liquid yield streams backed by the Robinhood ecosystem USDG yield-bearing stablecoin for consistent holder payouts.</p>
             </div>
           </div>
         </article>
 
-        <!-- 7. Market Halt Events -->
+        <!-- 7. Substation Workshop (Dual NFT Burn Engines) -->
+        <article class="doc-panel" id="doc-workshop">
+          <div class="doc-panel-head">
+            <h3>7. Substation Workshop: Dual NFT Burn Engines</h3>
+            <span class="panel-num">#07</span>
+          </div>
+          <p>
+            To provide permanent deflationary pressure on the NFT collection and offer strategic game-theoretic decisions for holders, the protocol includes two dedicated NFT burn pathways within the <strong>Substation Workshop</strong>:
+          </p>
+          <div class="substation-grid-2col" style="margin-top: 14px;">
+            <div class="sub-card-featured">
+              <div class="sub-card-top">
+                <div class="sub-icon-emoji">🔨</div>
+                <span class="sub-badge sub-badge-cyan">OPTION 1 // THE FORGE</span>
+              </div>
+              <h4 style="font-family: var(--font-pixel); font-size: 13px; color: var(--paper-cream); margin-bottom: 6px;">Tier Evolution</h4>
+              <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.5;">
+                Melt <strong>3 Type-1 Single-Phase Breakers</strong> to forge <strong>1 rare Type-2 Dual Relay Breaker</strong> (1.5&times; multiplier). The 3 input Breakers are permanently incinerated to <code>0x...dEaD</code>, shrinking common floor supply while upgrading yield tier.
+              </p>
+            </div>
+            <div class="sub-card-featured">
+              <div class="sub-card-top">
+                <div class="sub-icon-emoji">⏱</div>
+                <span class="sub-badge sub-badge-amber">OPTION 2 // OVERCLOCK LAB</span>
+              </div>
+              <h4 style="font-family: var(--font-pixel); font-size: 13px; color: var(--paper-cream); margin-bottom: 6px;">Component Sacrifice</h4>
+              <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.5;">
+                Select a primary Master Breaker and sacrifice auxiliary Breakers to permanently increase the master's multiplier: <strong>+0.25&times;</strong> per Type-1 sacrificed, and <strong>+0.50&times;</strong> per Type-2 sacrificed. The boost is permanently recorded on-chain.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 8. Market Halt Events -->
         <article class="doc-panel" id="doc-halts">
           <div class="doc-panel-head">
-            <h3>7. Market Halt Volatility Events</h3>
-            <span class="panel-num">#07</span>
+            <h3>8. Market Halt Volatility Events</h3>
+            <span class="panel-num">#08</span>
           </div>
           <p>
             When trading volume surges exponentially or real-world equity market volatility exceeds critical thresholds, the smart contract triggers a <strong>15-minute Market Halt State</strong>.
@@ -316,32 +338,36 @@
           </p>
           <ul style="margin-left: 20px; margin-top: 8px; color: var(--paper-cream); font-size: 14px; line-height: 1.6;">
             <li><strong>2&times; Dividend Acceleration:</strong> Fee distribution rates to Energized Breakers double.</li>
-            <li><strong>Surge Shield Perks:</strong> Type-3, Type-4, and Type-5 devices activate their mechanical surge shields to capture surplus volume multipliers.</li>
+            <li><strong>Surge Shield Perks:</strong> Type-3 HV Transformer Breakers activate their mechanical surge shields for +50% bonus payout distribution.</li>
           </ul>
         </article>
 
-        <!-- 8. FAQ & Verification -->
+        <!-- 9. FAQ & Verification -->
         <article class="doc-panel" id="doc-faq">
           <div class="doc-panel-head">
-            <h3>8. Frequently Asked Questions &amp; Verification</h3>
-            <span class="panel-num">#08</span>
+            <h3>9. Frequently Asked Questions &amp; Verification</h3>
+            <span class="panel-num">#09</span>
           </div>
           <div class="faq-list">
             <details class="faq-item" open>
               <summary>Can an Energized Breaker ever be un-energized?</summary>
-              <p>No. Energizing is a strictly one-way function in the smart contract. There is no unwinding, unbonding, or escrow. The backing $FUSE is burned forever, and the device remains permanently active.</p>
+              <p>Yes! Holders can call <code>unlockAndDeenergize(tokenId)</code> at any time. The 0.25 $FUSE token escrowed in the Vault is returned directly to your wallet, any pending dividends are instantly claimed, and the device transitions back to earning baseline yield from the 10% Standby Pool.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Why lock 0.25 $FUSE instead of 1.0 $FUSE?</summary>
+              <p>With a fixed total supply of 3,333 $FUSE tokens and 3,333 NFTs, locking 0.25 $FUSE mathematically guarantees that even if 100% of all 3,333 devices are energized simultaneously, a maximum of 25.0% of the total $FUSE supply (833.25 tokens) is ever locked. This leaves <strong>at least 75.0% of the supply (2,499.75 $FUSE) permanently floating for DEX trading and liquidity</strong>.</p>
+            </details>
+            <details class="faq-item">
+              <summary>In what currency are yields distributed?</summary>
+              <p>Yields are not paid in raw ETH. The protocol automatically converts fees into tokenized stocks ($NVDA, $HOOD, $TSLA) and the USDG yield-bearing stablecoin, which holders claim directly into their EVM wallets.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What is the collection allocation?</summary>
+              <p>Circuit Breakers has a hard cap of 3,333 devices on Robinhood Chain: <strong>3,300 devices (99.0%)</strong> for the public mint on OpenSea at 0.01 ETH, and <strong>33 devices (1.0%)</strong> reserved for the core team development and ecosystem vault.</p>
             </details>
             <details class="faq-item">
               <summary>What network is Circuit Breakers deployed on?</summary>
               <p>Circuit Breakers operates natively on Robinhood Chain (Arbitrum L2), enabling direct interaction with real-world tokenized equities, sub-cent gas fees, and instant finality.</p>
-            </details>
-            <details class="faq-item">
-              <summary>What triggers a Market Halt event?</summary>
-              <p>Market Halt events trigger when DEX trading volume exceeds pre-set 1-hour volatility thresholds or real-world VIX volatility feeds trigger on-chain. During the 15-minute halt, dividend distribution rates to Energized Breakers double.</p>
-            </details>
-            <details class="faq-item">
-              <summary>Is there any team allocation or insider tax cut?</summary>
-              <p>No. Circuit Breakers has a 0% team allocation and 0% venture reserve. 100% of tokens and devices circulate publicly via fair launch.</p>
             </details>
           </div>
         </article>
